@@ -57,7 +57,6 @@ export function DynamicAdminSubPages() {
   // Firestore Dynamic Collections States
   const [enquiries, setEnquiries] = useState([]);
   const [users, setUsers] = useState([]);
-  const [logs, setLogs] = useState([]);
   
   // Custom Dynamic Content Forms States
   const [aboutForm, setAboutForm] = useState({
@@ -111,11 +110,6 @@ export function DynamicAdminSubPages() {
         } else {
           setFacilities(["Modular Joint Replacement Suite", "Ultrasonic Spine Care Wing", "Emergency Triage Unit", "Surgical ICU Room"]);
         }
-      } else if (path === "activity-logs") {
-        const qSnap = await getDocs(collection(db, "auditLogs"));
-        const list = qSnap.docs.map((d) => ({ id: d.id, ...d.data() }));
-        list.sort((a, b) => b.timestamp.localeCompare(a.timestamp));
-        setLogs(list);
       }
     } catch (err) {
       console.error("Failed to load subpage resources:", err);
@@ -238,12 +232,8 @@ export function DynamicAdminSubPages() {
         return { title: "Helpline Enquiries Log", desc: "Track messages and requests sent through public contact forms." };
       case "users":
         return { title: "Staff Users Directory", desc: "Manage clinical staff dashboard login credentials." };
-      case "roles":
-        return { title: "Privileges & Access Roles", desc: "Configure access roles (Chief Surgeon, Desk Agent, Pharmacist)." };
       case "backups":
         return { title: "Database Backups & Seeds", desc: "Restore seed records or backup current collections." };
-      case "activity-logs":
-        return { title: "System Audit Logs", desc: "Review database modifications and admin actions." };
       default:
         return { title: "Administration Module", desc: "Manage hospital assets." };
     }
@@ -488,37 +478,6 @@ export function DynamicAdminSubPages() {
           </div>
         )}
 
-        {/* ACCESS ROLES SETUP */}
-        {path === "roles" && (
-          <div className="space-y-6">
-            <h3 className="font-bold text-sm uppercase tracking-wider text-slate-400 border-b pb-2">Manage Access Roles</h3>
-            <p className="text-xs text-slate-500 leading-relaxed font-semibold">
-              Configure strict permissions and access levels for administrative staff.
-            </p>
-            <div className="space-y-4 text-xs font-bold text-slate-650 dark:text-slate-350">
-              <div className="p-4 bg-slate-50 dark:bg-slate-850 rounded-2xl flex flex-col sm:flex-row justify-between gap-4">
-                <div className="text-left">
-                  <span className="text-sm font-extrabold text-slate-800 dark:text-white">Chief Surgeon (Super Admin)</span>
-                  <p className="text-[10px] text-slate-400 mt-1 font-semibold">Full global reads, database backups and delete privileges.</p>
-                </div>
-                <span className="text-[10px] uppercase font-bold text-[#1E7FC2] self-start sm:self-center">Unrestricted Access</span>
-              </div>
-              
-              <div className="p-4 bg-slate-50 dark:bg-slate-850 rounded-2xl flex flex-col sm:flex-row justify-between gap-4">
-                <div className="text-left">
-                  <span className="text-sm font-extrabold text-slate-800 dark:text-white">Desk Coordinator (Staff Role)</span>
-                  <p className="text-[10px] text-slate-400 mt-1 font-semibold">Allowed to read/write Appointments, read enquiries, modify doctors consultation timings.</p>
-                </div>
-                <div className="flex flex-wrap gap-2 self-start sm:self-center font-bold text-[9px] uppercase">
-                  <span className="bg-blue-100 text-[#0B3C5D] px-2 py-0.5 rounded">Appointments</span>
-                  <span className="bg-emerald-100 text-[#3FA535] px-2 py-0.5 rounded">Enquiries</span>
-                  <span className="bg-purple-100 text-purple-800 px-2 py-0.5 rounded">Timings</span>
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
-
         {/* BACKUPS & SEEDS */}
         {path === "backups" && (
           <div className="space-y-6">
@@ -547,29 +506,6 @@ export function DynamicAdminSubPages() {
                 Run DB Seeding Console
               </a>
             </div>
-          </div>
-        )}
-
-        {/* AUDIT LOGS */}
-        {path === "activity-logs" && (
-          <div className="space-y-6">
-            <h3 className="font-bold text-sm uppercase tracking-wider text-slate-400 border-b pb-2">Recent Administrator Actions</h3>
-            {logs.length === 0 ? (
-              <p className="text-xs text-slate-400 py-10 text-center font-semibold">No actions recorded in audit logs yet.</p>
-            ) : (
-              <div className="space-y-3 max-h-[500px] overflow-y-auto pr-2 no-scrollbar">
-                {logs.map((log) => (
-                  <div key={log.id} className="p-3.5 bg-slate-50 dark:bg-slate-850 rounded-xl flex items-start justify-between text-xs font-bold text-left">
-                    <div>
-                      <span className="text-[#1E7FC2] font-extrabold">{log.user}</span>
-                      <p className="text-slate-550 dark:text-slate-300 font-semibold mt-0.5">{log.action}</p>
-                      {log.meta && <span className="text-[10px] text-slate-400 block font-normal mt-0.5">{log.meta}</span>}
-                    </div>
-                    <span className="text-[10px] text-slate-400 font-normal ml-3 whitespace-nowrap">{log.timestamp}</span>
-                  </div>
-                ))}
-              </div>
-            )}
           </div>
         )}
 

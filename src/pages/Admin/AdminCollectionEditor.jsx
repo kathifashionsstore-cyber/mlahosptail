@@ -14,6 +14,7 @@ import {
   Archive,
   ArrowDown,
   ArrowUp,
+  ArrowUpDown,
   Check,
   Copy,
   Eye,
@@ -100,6 +101,9 @@ export function AdminCollectionEditor({
   const [statusFilter, setStatusFilter] = useState("all");
   const [selectedIds, setSelectedIds] = useState([]);
   const [draggedId, setDraggedId] = useState("");
+  const [sortConfig, setSortConfig] = useState({ key: "order", direction: "asc" });
+  const [currentPage, setCurrentPage] = useState(1);
+  const [initialFormData, setInitialFormData] = useState({});
 
   const orderedFields = useMemo(() => fields, [fields]);
 
@@ -119,7 +123,27 @@ export function AdminCollectionEditor({
     });
   }, [items, searchTerm, statusFilter]);
 
-  const allVisibleSelected = visibleItems.length > 0 && visibleItems.every((item) => selectedIds.includes(item.id));
+  const sortedItems = useMemo(() => {
+    const direction = sortConfig.direction === "desc" ? -1 : 1;
+    return [...visibleItems].sort((a, b) => {
+      const aValue = sortConfig.key === "record" ? getDisplayTitle(a) : a[sortConfig.key];
+      const bValue = sortConfig.key === "record" ? getDisplayTitle(b) : b[sortConfig.key];
+
+      if (typeof aValue === "number" && typeof bValue === "number") {
+        return (aValue - bValue) * direction;
+      }
+
+      return String(aValue ?? "").localeCompare(String(bValue ?? "")) * direction;
+    });
+  }, [visibleItems, sortConfig]);
+
+  const totalPages = Math.max(1, Math.ceil(sortedItems.length / 20));
+  const paginatedItems = sortedItems.slice((currentPage - 1) * 20, currentPage * 20);
+  const allVisibleSelected = paginatedItems.length > 0 && paginatedItems.every((item) => selectedIds.includes(item.id));
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchTerm, statusFilter, collectionName]);
 
   const fetchItems = async () => {
     setLoading(true);
@@ -153,6 +177,7 @@ export function AdminCollectionEditor({
     if (sortField && defaults[sortField] === "") defaults[sortField] = items.length + 1;
     setEditingItem(null);
     setFormData(defaults);
+    setInitialFormData(defaults);
     setIsModalOpen(true);
   };
 
@@ -163,6 +188,7 @@ export function AdminCollectionEditor({
     });
     setEditingItem(item);
     setFormData(nextData);
+    setInitialFormData(nextData);
     setIsModalOpen(true);
   };
 
@@ -308,11 +334,29 @@ export function AdminCollectionEditor({
   const toggleSelectAllVisible = () => {
     setSelectedIds((prev) => {
       if (allVisibleSelected) {
-        return prev.filter((id) => !visibleItems.some((item) => item.id === id));
+        return prev.filter((id) => !paginatedItems.some((item) => item.id === id));
       }
 
-      return Array.from(new Set([...prev, ...visibleItems.map((item) => item.id)]));
+      return Array.from(new Set([...prev, ...paginatedItems.map((item) => item.id)]));
     });
+  };
+
+  const requestSort = (key) => {
+    setSortConfig((prev) => ({
+      key,
+      direction: prev.key === key && prev.direction === "asc" ? "desc" : "asc",
+    }));
+  };
+
+  const renderSortIndicator = (key) => {
+    if (sortConfig.key !== key) return <ArrowUpDown className="w-3.5 h-3.5 text-slate-300" />;
+    return sortConfig.direction === "asc" ? <ArrowUp className="w-3.5 h-3.5" /> : <ArrowDown className="w-3.5 h-3.5" />;
+  };
+
+  const closeDrawer = () => {
+    const hasUnsavedChanges = JSON.stringify(formData) !== JSON.stringify(initialFormData);
+    if (hasUnsavedChanges && !window.confirm("Close without saving your changes?")) return;
+    setIsModalOpen(false);
   };
 
   const handleBulkUpdate = async (patch, confirmMessage) => {
@@ -494,11 +538,19 @@ export function AdminCollectionEditor({
       </div>
 
       {loading ? (
-        <div className="text-center py-20">
-          <div className="w-8 h-8 border-3 border-primary border-t-transparent rounded-full animate-spin mx-auto" />
-          <p className="text-slate-400 mt-3 font-semibold text-xs">Loading records...</p>
+        <div className="space-y-3 rounded-3xl border border-slate-100 bg-white p-5 dark:border-slate-850 dark:bg-slate-900">
+          {Array.from({ length: 5 }).map((_, index) => (
+            <div key={index} className="flex items-center gap-4 rounded-xl p-3">
+              <div className="h-10 w-10 rounded-lg bg-slate-100 shimmer-placeholder dark:bg-slate-800" />
+              <div className="flex-1 space-y-2">
+                <div className="h-3 w-1/2 rounded bg-slate-100 shimmer-placeholder dark:bg-slate-800" />
+                <div className="h-2.5 w-1/3 rounded bg-slate-100 shimmer-placeholder dark:bg-slate-800" />
+              </div>
+              <div className="h-8 w-24 rounded bg-slate-100 shimmer-placeholder dark:bg-slate-800" />
+            </div>
+          ))}
         </div>
-      ) : visibleItems.length > 0 ? (
+      ) : sortedItems.length > 0 ? (
         <div className="bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-850 rounded-3xl overflow-hidden shadow-sm">
           <div className="overflow-x-auto">
             <table className="w-full text-left border-collapse text-sm">
@@ -512,21 +564,38 @@ export function AdminCollectionEditor({
                       className="rounded text-primary focus:ring-primary h-4 w-4"
                     />
                   </th>
-                  <th className="px-6 py-4">Record</th>
-                  {allowOrdering && <th className="px-6 py-4">Order</th>}
-                  <th className="px-6 py-4">Status</th>
+                  <th className="px-6 py-4">
+                    <button type="button" onClick={() => requestSort("record")} className="inline-flex items-center gap-1.5 hover:text-slate-600">
+                      <span>Record</span>
+                      {renderSortIndicator("record")}
+                    </button>
+                  </th>
+                  {allowOrdering && (
+                    <th className="px-6 py-4">
+                      <button type="button" onClick={() => requestSort(sortField)} className="inline-flex items-center gap-1.5 hover:text-slate-600">
+                        <span>Order</span>
+                        {renderSortIndicator(sortField)}
+                      </button>
+                    </th>
+                  )}
+                  <th className="px-6 py-4">
+                    <button type="button" onClick={() => requestSort("status")} className="inline-flex items-center gap-1.5 hover:text-slate-600">
+                      <span>Status</span>
+                      {renderSortIndicator("status")}
+                    </button>
+                  </th>
                   <th className="px-6 py-4 text-right">Actions</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-50 dark:divide-slate-800 font-semibold text-slate-700 dark:text-slate-300">
-                {visibleItems.map((item) => (
+                {paginatedItems.map((item, rowIndex) => (
                   <tr
                     key={item.id}
                     draggable={allowOrdering}
                     onDragStart={() => setDraggedId(item.id)}
                     onDragOver={(event) => allowOrdering && event.preventDefault()}
                     onDrop={() => allowOrdering && handleDrop(item)}
-                    className="hover:bg-slate-50/50 dark:hover:bg-slate-800/20 transition"
+                    className={`${rowIndex % 2 === 0 ? "bg-white dark:bg-slate-900" : "bg-slate-50/40 dark:bg-slate-950/20"} hover:bg-slate-50 dark:hover:bg-slate-800/20 transition`}
                   >
                     <td className="px-6 py-4">
                       <input
@@ -604,24 +673,60 @@ export function AdminCollectionEditor({
               </tbody>
             </table>
           </div>
+          <div className="flex flex-col gap-3 border-t border-slate-100 px-5 py-4 text-xs font-bold text-slate-500 dark:border-slate-800 sm:flex-row sm:items-center sm:justify-between">
+            <span>
+              Showing {(currentPage - 1) * 20 + 1}-{Math.min(currentPage * 20, sortedItems.length)} of {sortedItems.length}
+            </span>
+            <div className="flex items-center gap-2">
+              <button
+                type="button"
+                onClick={() => setCurrentPage((page) => Math.max(1, page - 1))}
+                disabled={currentPage === 1}
+                className="rounded-lg border border-slate-200 px-3 py-1.5 disabled:cursor-not-allowed disabled:opacity-40 dark:border-slate-700"
+              >
+                Prev
+              </button>
+              <span className="px-2">Page {currentPage} of {totalPages}</span>
+              <button
+                type="button"
+                onClick={() => setCurrentPage((page) => Math.min(totalPages, page + 1))}
+                disabled={currentPage === totalPages}
+                className="rounded-lg border border-slate-200 px-3 py-1.5 disabled:cursor-not-allowed disabled:opacity-40 dark:border-slate-700"
+              >
+                Next
+              </button>
+            </div>
+          </div>
         </div>
       ) : (
         <div className="text-center py-20 bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-850 rounded-3xl p-6 text-slate-400 font-semibold">
-          {items.length === 0 ? "No records found. Click \"Add New\" to create one." : "No records match the current search or filter."}
+          <FileText className="mx-auto h-10 w-10 text-slate-300" />
+          <p className="mt-3">{items.length === 0 ? `No ${title.toLowerCase()} yet.` : "No records match the current search or filter."}</p>
+          {items.length === 0 && (
+            <button
+              type="button"
+              onClick={openAddModal}
+              className="mt-4 inline-flex items-center gap-1.5 rounded-xl bg-primary px-4 py-2.5 text-xs font-bold text-white"
+            >
+              <Plus className="w-4 h-4" />
+              <span>Add first record</span>
+            </button>
+          )}
         </div>
       )}
 
       <AnimatePresence>
         {isModalOpen && (
-          <div className="fixed inset-0 z-50 bg-black/60 flex items-center justify-center p-4 overflow-y-auto">
+          <div className="fixed inset-0 z-50 flex justify-end bg-black/60">
             <motion.div
-              initial={{ scale: 0.95, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.95, opacity: 0 }}
-              className="bg-white dark:bg-slate-900 border border-slate-150 dark:border-slate-800 rounded-3xl max-w-3xl w-full p-6 md:p-8 space-y-6 shadow-2xl relative max-h-[90vh] overflow-y-auto"
+              initial={{ x: "100%", opacity: 0 }}
+              animate={{ x: 0, opacity: 1 }}
+              exit={{ x: "100%", opacity: 0 }}
+              transition={{ type: "tween", duration: 0.24 }}
+              className="relative h-full w-full max-w-xl overflow-y-auto bg-white p-6 shadow-2xl dark:bg-slate-900 md:rounded-l-3xl md:p-8"
             >
               <button
-                onClick={() => setIsModalOpen(false)}
+                onClick={closeDrawer}
                 className="absolute top-4 right-4 p-1.5 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full transition"
               >
                 <X className="w-5 h-5 text-slate-400" />
@@ -710,11 +815,18 @@ export function AdminCollectionEditor({
                   );
                 })}
 
-                <div className="md:col-span-2 pt-2">
+                <div className="md:col-span-2 flex flex-col gap-3 pt-2 sm:flex-row">
+                  <button
+                    type="button"
+                    onClick={closeDrawer}
+                    className="inline-flex items-center justify-center rounded-xl border border-slate-200 px-4 py-3 text-sm font-bold text-slate-600 transition hover:bg-slate-50 dark:border-slate-700 dark:text-slate-300 dark:hover:bg-slate-800 sm:w-36"
+                  >
+                    Cancel
+                  </button>
                   <button
                     type="submit"
                     disabled={saving || !!uploadingField}
-                    className="inline-flex items-center justify-center space-x-2 w-full bg-primary hover:bg-primary-dark dark:bg-primary-light dark:hover:bg-primary text-white font-bold py-3 px-4 rounded-xl shadow-md transition disabled:opacity-50 text-sm"
+                    className="inline-flex flex-1 items-center justify-center space-x-2 bg-primary hover:bg-primary-dark dark:bg-primary-light dark:hover:bg-primary text-white font-bold py-3 px-4 rounded-xl shadow-md transition disabled:opacity-50 text-sm"
                   >
                     <Save className="w-4.5 h-4.5" />
                     <span>{saving ? "Saving..." : "Save Record"}</span>

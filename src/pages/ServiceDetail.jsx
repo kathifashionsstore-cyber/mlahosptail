@@ -8,7 +8,7 @@ import DetailTemplate from "../components/DetailTemplate";
 
 export function ServiceDetail() {
   const { slug } = useParams();
-  const { services } = useApp();
+  const { services, getImageUrl } = useApp();
   const [service, setService] = useState(null);
   const [loading, setLoading] = useState(true);
 
@@ -56,6 +56,12 @@ export function ServiceDetail() {
     );
   }
 
+  const fallbackOgImage = getImageUrl(
+    "og-default-image",
+    "https://images.unsplash.com/photo-1559757148-5c350d0d3c56?auto=format&fit=crop&w=600&q=80"
+  );
+  const serviceShareImage = getImageUrl(`service-thumb-${service.slug}`, service.thumbnailUrl || fallbackOgImage);
+
   return (
     <>
       <Helmet>
@@ -67,14 +73,14 @@ export function ServiceDetail() {
         <meta property="og:type" content="website" />
         <meta property="og:title" content={service.seoTitle || service.name} />
         <meta property="og:description" content={service.seoDescription || service.shortDescription} />
-        <meta property="og:image" content={service.thumbnailUrl || "https://images.unsplash.com/photo-1559757148-5c350d0d3c56?auto=format&fit=crop&w=600&q=80"} />
+        <meta property="og:image" content={serviceShareImage} />
         <meta property="og:url" content={window.location.href} />
         
         {/* Twitter */}
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:title" content={service.seoTitle || service.name} />
         <meta name="twitter:description" content={service.seoDescription || service.shortDescription} />
-        <meta name="twitter:image" content={service.thumbnailUrl || "https://images.unsplash.com/photo-1559757148-5c350d0d3c56?auto=format&fit=crop&w=600&q=80"} />
+        <meta name="twitter:image" content={serviceShareImage} />
 
         {/* Canonical Link */}
         <link rel="canonical" href={window.location.href} />

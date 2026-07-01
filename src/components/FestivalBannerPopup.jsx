@@ -1,7 +1,15 @@
-import React, { useState, useEffect, useRef } from "react";
-import { X, ArrowRight } from "lucide-react";
-import { useApp } from "../context/AppContext";
+import React, { useEffect, useRef, useState } from "react";
+import { ArrowRight, Check, Phone, X } from "lucide-react";
 import { AnimatePresence, motion } from "framer-motion";
+import { useApp } from "../context/AppContext";
+
+function parseBannerDate(value) {
+  if (!value) return null;
+  if (value?.toDate) return value.toDate();
+
+  const parsed = new Date(value);
+  return Number.isNaN(parsed.getTime()) ? null : parsed;
+}
 
 export function FestivalBannerPopup() {
   const { festivalBanners } = useApp();
@@ -9,143 +17,139 @@ export function FestivalBannerPopup() {
   const [selectedBanner, setSelectedBanner] = useState(null);
   const backdropRef = useRef(null);
 
-  const now = new Date();
-  
-  // Find banners active in the current date/time window
-  const activeBanners = (festivalBanners || []).filter((banner) => {
-    if (banner.isActive === false) return false;
-    const start = banner.startDate ? new Date(banner.startDate) : null;
-    const end = banner.endDate ? new Date(banner.endDate) : null;
-    
-    if (start && now < start) return false;
-    if (end && now > end) return false;
-    return true;
-  });
-
   useEffect(() => {
+    const now = new Date();
+    const activeBanners = (festivalBanners || []).filter((banner) => {
+      if (banner.isActive === false || banner.active === false) return false;
+
+      const start = parseBannerDate(banner.startDate);
+      const end = parseBannerDate(banner.endDate);
+
+      if (start && now < start) return false;
+      if (end && now > end) return false;
+      return true;
+    });
+
     if (activeBanners.length === 0) {
       setIsOpen(false);
+      setSelectedBanner(null);
       return;
     }
 
-    const hasShownInSession = sessionStorage.getItem("festival_banner_shown") === "true";
-    if (hasShownInSession) return;
+    if (sessionStorage.getItem("festivalBannerDismissed") === "true") return;
 
-    // Pick banner in sequence or rotate based on session index
     const lastIdxStr = sessionStorage.getItem("last_festival_banner_idx");
-    let selectIndex = 0;
-    if (lastIdxStr !== null) {
-      const lastIdx = parseInt(lastIdxStr, 10);
-      selectIndex = (lastIdx + 1) % activeBanners.length;
-    }
+    const lastIdx = lastIdxStr === null ? -1 : Number.parseInt(lastIdxStr, 10);
+    const selectIndex = Number.isFinite(lastIdx) ? (lastIdx + 1) % activeBanners.length : 0;
 
     setSelectedBanner(activeBanners[selectIndex]);
     setIsOpen(true);
-
-    // Save index for subsequent visits
-    sessionStorage.setItem("last_festival_banner_idx", selectIndex.toString());
-  }, [festivalBanners, activeBanners.length]);
+    sessionStorage.setItem("last_festival_banner_idx", String(selectIndex));
+  }, [festivalBanners]);
 
   const handleClose = () => {
+    sessionStorage.setItem("festivalBannerDismissed", "true");
     setIsOpen(false);
-    sessionStorage.setItem("festival_banner_shown", "true");
   };
 
-  const handleBackdropClick = (e) => {
-    if (backdropRef.current && e.target === backdropRef.current) {
+  const handleBackdropClick = (event) => {
+    if (backdropRef.current && event.target === backdropRef.current) {
       handleClose();
     }
   };
-
-  if (!isOpen || !selectedBanner) return null;
 
   const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
   return (
     <AnimatePresence>
-      <div
-        ref={backdropRef}
-        onClick={handleBackdropClick}
-        className="fixed inset-0 z-50 bg-black/75 backdrop-blur-md flex items-center justify-center p-4"
-      >
+      {isOpen && selectedBanner && (
         <motion.div
-          initial={{ opacity: 0, scale: prefersReducedMotion ? 1 : 0.93 }}
-          animate={{ opacity: 1, scale: 1 }}
-          exit={{ opacity: 0, scale: prefersReducedMotion ? 1 : 0.93 }}
-          transition={{ duration: 0.3, ease: "easeOut" }}
-          className="bg-slate-900 border border-slate-800 max-w-[640px] w-full rounded-3xl overflow-hidden shadow-2xl relative flex flex-col select-none"
+          ref={backdropRef}
+          onClick={handleBackdropClick}
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/75 p-4 backdrop-blur-sm"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: prefersReducedMotion ? 0.05 : 0.2 }}
         >
-          {/* Header/Title if provided */}
-          {selectedBanner.title && (
-            <div className="bg-slate-850 px-6 py-4 border-b border-slate-800 text-left">
-              <h3 className="font-serif font-extrabold text-sm text-slate-100 uppercase tracking-wider">
-                {selectedBanner.title}
-              </h3>
-            </div>
-          )}
-
-          {/* Close button top right */}
-          <button
-            onClick={handleClose}
-            className="absolute top-4 right-4 z-10 p-2 rounded-full bg-black/40 hover:bg-black/60 text-white/80 hover:text-white transition"
-            aria-label="Close Announcement"
+          <motion.div
+            initial={{ opacity: 0, scale: prefersReducedMotion ? 1 : 0.94 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: prefersReducedMotion ? 1 : 0.94 }}
+            transition={{ duration: prefersReducedMotion ? 0.05 : 0.2, ease: "easeOut" }}
+            className="relative flex w-full max-w-[640px] select-none flex-col overflow-hidden rounded-2xl border border-slate-800 bg-slate-900 shadow-2xl"
           >
-            <X className="w-4.5 h-4.5" />
-          </button>
+            {selectedBanner.title && (
+              <div className="border-b border-slate-800 bg-slate-900 px-6 py-4 text-left">
+                <h3 className="font-serif text-sm font-extrabold uppercase tracking-wider text-slate-100">
+                  {selectedBanner.title}
+                </h3>
+              </div>
+            )}
 
-          {/* Main banner image */}
-          <div className="w-full max-h-[60vh] overflow-hidden bg-slate-950 flex items-center justify-center relative">
-            <img
-              src={selectedBanner.imageUrl || "https://images.unsplash.com/photo-1576091160550-2173dba999ef?auto=format&fit=crop&w=800&q=80"}
-              alt={selectedBanner.title || "Festival Banner"}
-              className="w-full h-full object-cover min-h-[250px]"
-            />
-          </div>
+            <button
+              onClick={handleClose}
+              className="absolute right-4 top-4 z-10 rounded-full bg-black/45 p-2 text-white/80 transition hover:bg-black/65 hover:text-white"
+              aria-label="Close festival banner"
+            >
+              <X className="h-4.5 w-4.5" />
+            </button>
 
-          {/* Subtitle / Description if exists */}
-          {selectedBanner.subtitle && (
-            <div className="bg-slate-900 px-6 py-4 text-left border-t border-slate-800 text-xs font-medium text-slate-350 leading-relaxed">
-              <p>{selectedBanner.subtitle}</p>
+            <div className="relative flex max-h-[60vh] w-full items-center justify-center overflow-hidden bg-slate-950">
+              <img
+                src={selectedBanner.imageUrl || "https://images.unsplash.com/photo-1576091160550-2173dba999ef?auto=format&fit=crop&w=800&q=80"}
+                alt={selectedBanner.title || "Festival Banner"}
+                className="h-full min-h-[250px] w-full object-cover"
+              />
             </div>
-          )}
 
-          {/* Bottom Footer Strip */}
-          <div className="bg-slate-950 border-t border-slate-805/40 px-6 py-4 flex flex-col sm:flex-row justify-between items-center gap-3">
-            {/* Developer Tag */}
-            <span className="text-[10px] font-extrabold tracking-wide text-slate-500 uppercase self-start sm:self-center">
-              Website by WayzenTech | 📞 9398724704
-            </span>
+            {selectedBanner.subtitle && (
+              <div className="border-t border-slate-800 bg-slate-900 px-6 py-4 text-left text-xs font-medium leading-relaxed text-slate-300">
+                <p>{selectedBanner.subtitle}</p>
+              </div>
+            )}
 
-            {/* Action buttons */}
-            <div className="flex items-center space-x-2.5 w-full sm:w-auto">
-              <button
-                onClick={handleClose}
-                className="flex-1 sm:flex-none bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white font-bold text-xs px-4 py-2.5 rounded-xl transition"
-              >
-                Close
-              </button>
-              
-              {selectedBanner.ctaLink ? (
-                <a
-                  href={selectedBanner.ctaLink}
-                  onClick={handleClose}
-                  className="flex-grow sm:flex-grow-0 inline-flex items-center justify-center space-x-1 bg-[#1E7FC2] hover:bg-[#0B3C5D] text-white font-bold text-xs px-5 py-2.5 rounded-xl transition shadow-md"
-                >
-                  <span>{selectedBanner.ctaText || "Continue"}</span>
-                  <ArrowRight className="w-3.5 h-3.5" />
-                </a>
-              ) : (
+            <div className="grid grid-cols-1 gap-3 border-t border-slate-800 bg-slate-950 px-6 py-4 sm:grid-cols-[1fr_auto] sm:items-center">
+              <span className="inline-flex items-center gap-1.5 text-[10px] font-extrabold uppercase tracking-wide text-slate-400">
+                <span>Website made by WayzenTech</span>
+                <span>|</span>
+                <Phone className="h-3 w-3" />
+                <span>9398724704</span>
+              </span>
+
+              <div className="flex w-full items-center justify-center gap-2.5 sm:w-auto">
+                {selectedBanner.ctaLink ? (
+                  <a
+                    href={selectedBanner.ctaLink}
+                    onClick={handleClose}
+                    className="inline-flex flex-1 items-center justify-center gap-1.5 rounded-xl bg-[#1E7FC2] px-5 py-2.5 text-xs font-bold text-white shadow-md transition hover:bg-[#0B3C5D] sm:flex-none"
+                  >
+                    <Check className="h-3.5 w-3.5" />
+                    <span>{selectedBanner.ctaText || "Continue to Website"}</span>
+                    <ArrowRight className="h-3.5 w-3.5" />
+                  </a>
+                ) : (
+                  <button
+                    onClick={handleClose}
+                    className="inline-flex flex-1 items-center justify-center gap-1.5 rounded-xl bg-[#1E7FC2] px-5 py-2.5 text-xs font-bold text-white shadow-md transition hover:bg-[#0B3C5D] sm:flex-none"
+                  >
+                    <Check className="h-3.5 w-3.5" />
+                    <span>{selectedBanner.ctaText || "Continue to Website"}</span>
+                  </button>
+                )}
+
                 <button
                   onClick={handleClose}
-                  className="flex-grow sm:flex-grow-0 bg-[#1E7FC2] hover:bg-[#0B3C5D] text-white font-bold text-xs px-5 py-2.5 rounded-xl transition shadow-md"
+                  className="inline-flex flex-1 items-center justify-center gap-1.5 rounded-xl bg-slate-800 px-4 py-2.5 text-xs font-bold text-slate-300 transition hover:bg-slate-700 hover:text-white sm:flex-none"
                 >
-                  {selectedBanner.ctaText || "Continue to Website"}
+                  <X className="h-3.5 w-3.5" />
+                  <span>Close</span>
                 </button>
-              )}
+              </div>
             </div>
-          </div>
+          </motion.div>
         </motion.div>
-      </div>
+      )}
     </AnimatePresence>
   );
 }

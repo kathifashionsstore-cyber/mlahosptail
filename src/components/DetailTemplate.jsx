@@ -136,7 +136,7 @@ export function DetailTemplate({ item, type = "service" }) {
 
   const emergencyPhone = settings?.phoneNumbers?.find((p) => p.label === "Hospital")?.number || "+91 8647223625";
   const whatsappNumber = settings?.whatsappNumber || "+917383085084";
-  const heroBgImage = getImageUrl(`service-hero-${item.slug}`, item.heroUrl || item.bannerUrl || item.thumbnailUrl || "https://images.unsplash.com/photo-1576091160550-2173dba999ef?auto=format&fit=crop&w=1400&q=85");
+  const heroBgImage = getImageUrl(`service-hero-${item.slug}`, item.heroImageUrl || item.heroUrl || item.bannerUrl || item.thumbnailUrl || "https://images.unsplash.com/photo-1576091160550-2173dba999ef?auto=format&fit=crop&w=1400&q=85");
 
   // Filter FAQs based on query
   const filteredFaqs = (item.faqs || []).filter((faq) =>
@@ -505,7 +505,7 @@ export function DetailTemplate({ item, type = "service" }) {
                     <div className="flex items-center gap-3">
                       <div className="w-12 h-12 rounded-full overflow-hidden bg-slate-50 flex-shrink-0 flex items-center justify-center border">
                         <img
-                          src={getImageUrl(`doctor-photo-${docItem.id}`, docItem.photoUrl || "https://images.unsplash.com/photo-1622253692010-333f2da6031d?auto=format&fit=crop&w=400&q=80")}
+                          src={getImageUrl(`doctor-photo-${docItem.slug || docItem.id}`, docItem.photoUrl || "https://images.unsplash.com/photo-1622253692010-333f2da6031d?auto=format&fit=crop&w=400&q=80")}
                           alt=""
                           className="w-full h-full object-cover"
                         />

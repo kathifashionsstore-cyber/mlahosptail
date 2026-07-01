@@ -455,9 +455,15 @@ h1, h2, h3, h4, h5, h6 {
 html.has-announcement .fixed-nav-offset {
   top: 36px !important;
 }
+html.has-announcement .public-mobile-drawer {
+  top: 116px !important;
+}
 @media (min-width: 768px) {
   html.has-announcement .fixed-nav-offset {
     top: 40px !important;
+  }
+  html.has-announcement .public-mobile-drawer {
+    top: 120px !important;
   }
 }
 html.has-announcement .pt-24 {
@@ -515,4 +521,3 @@ html.has-announcement .pt-32 {
   left: 150%;
   transition: left 0.9s ease-in-out;
 }
-

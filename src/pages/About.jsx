@@ -6,7 +6,7 @@ import { doc, getDoc, collection, getDocs, query, where, orderBy } from "firebas
 import { useApp } from "../context/AppContext";
 
 export function About() {
-  const { doctors } = useApp();
+  const { doctors, getImageUrl } = useApp();
   const [aboutContent, setAboutContent] = useState(null);
   const [awards, setAwards] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -44,7 +44,9 @@ export function About() {
   const visionText = aboutContent?.visionText || "To be the leading, most trusted orthopaedic center in Andhra Pradesh, recognized for surgical excellence, state-of-the-art facilities, and empathetic patient care.";
   const founderMessage = aboutContent?.founderMessage || "For over 30 years, our commitment has been to provide the highest standard of orthopaedic surgery and patient care. We believe in transparency, ethical practice, and adopting the latest medical advancements to serve our community.";
   const founderDoc = doctors.find((d) => d.id === "dr-aravinda-babu");
-  const founderPhotoUrl = founderDoc?.photoUrl || aboutContent?.founderPhotoUrl || "https://i.ibb.co/3sS7H9y/dr-aravinda-babu.jpg";
+  const founderPhotoUrl = getImageUrl("about-founder", founderDoc?.photoUrl || aboutContent?.founderPhotoUrl || "https://i.ibb.co/3sS7H9y/dr-aravinda-babu.jpg");
+  const facilitiesPhotoUrl = getImageUrl("about-facilities", "https://i.ibb.co/3sS7H9y/exterior.jpg");
+  const hospitalBuildingUrl = getImageUrl("about-hospital-building", facilitiesPhotoUrl);
   const facilitiesList = aboutContent?.facilitiesList || [
     "Two advanced operation theatres with Laminar Flow & C-Arm",
     "Dedicated Trauma ICU with multi-para monitors & ventilators",
@@ -78,7 +80,7 @@ export function About() {
           </div>
           <div className="relative aspect-[4/3] rounded-3xl overflow-hidden shadow-xl border border-slate-100 dark:border-slate-800 bg-slate-100 dark:bg-slate-900">
             <img
-              src="https://i.ibb.co/3sS7H9y/exterior.jpg"
+              src={hospitalBuildingUrl}
               alt="Hospital Facility"
               className="absolute inset-0 w-full h-full object-cover"
             />

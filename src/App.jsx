@@ -53,11 +53,9 @@ import AdminLayout from "./pages/Admin/AdminLayout";
 import Dashboard from "./pages/Admin/Dashboard";
 import Appointments from "./pages/Admin/Appointments";
 import ContentManager from "./pages/Admin/ContentManager";
-import { Testimonials as AdminTestimonials } from "./pages/Admin/Testimonials";
 import Settings from "./pages/Admin/Settings";
 import SeedPage from "./pages/Admin/SeedPage";
 import DynamicAdminSubPages from "./pages/Admin/DynamicAdminSubPages";
-import MediaLibrary from "./pages/Admin/MediaLibrary";
 import ImageManager from "./pages/Admin/ImageManager";
 import ThemeManager from "./pages/Admin/ThemeManager";
 import AnnouncementManager from "./pages/Admin/AnnouncementManager";
@@ -66,8 +64,7 @@ import {
   AdminDoctors,
   AdminFestivalBanners,
   AdminGallery,
-  AdminHeroBanners,
-  AdminSEOSettings,
+  AdminReviewsQueue,
   AdminServiceCategories,
   AdminServices,
   AdminTreatments,
@@ -100,16 +97,21 @@ function AppContent() {
     // Skip tracking for admin console paths or when data is initially loading
     if (loading || location.pathname.startsWith("/admin")) return;
 
-    const logPageView = async () => {
-      try {
-        await addDoc(collection(db, "pageViews"), {
-          page: location.pathname,
-          timestamp: serverTimestamp(),
-          device: window.innerWidth < 768 ? "mobile" : "desktop",
-        });
-      } catch (err) {
-        console.error("PageView logging failed:", err);
-      }
+    const sessionKey = `pv_${location.pathname}`;
+    if (sessionStorage.getItem(sessionKey) === "1") return;
+
+    const logPageView = () => {
+      fetch("/api/track-pageview", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ page: location.pathname, timestamp: Date.now() }),
+      })
+        .then((res) => {
+          if (res.ok) {
+            sessionStorage.setItem(sessionKey, "1");
+          }
+        })
+        .catch(console.error);
     };
     logPageView();
   }, [location.pathname, loading]);
@@ -143,23 +145,21 @@ function AppContent() {
           <Route path="service-categories" element={<AdminServiceCategories />} />
           <Route path="gallery" element={<AdminGallery />} />
           <Route path="blog" element={<AdminBlog />} />
-          <Route path="testimonials" element={<AdminTestimonials />} />
-          <Route path="hero-banners" element={<AdminHeroBanners />} />
+          <Route path="reviews-queue" element={<AdminReviewsQueue />} />
           <Route path="festival-banners" element={<AdminFestivalBanners />} />
           <Route path="settings" element={<Settings />} />
-          <Route path="seo-settings" element={<AdminSEOSettings />} />
           <Route path="image-manager" element={<ImageManager />} />
           <Route path="theme" element={<ThemeManager />} />
           <Route path="announcements" element={<AnnouncementManager />} />
           <Route path="homepage" element={<DynamicAdminSubPages />} />
+          <Route path="enquiries" element={<DynamicAdminSubPages />} />
+          <Route path="about" element={<DynamicAdminSubPages />} />
+          <Route path="facilities" element={<DynamicAdminSubPages />} />
           <Route path="users" element={<DynamicAdminSubPages />} />
-          <Route path="roles" element={<DynamicAdminSubPages />} />
           <Route path="menu-manager" element={<DynamicAdminSubPages />} />
           <Route path="footer-manager" element={<DynamicAdminSubPages />} />
           <Route path="theme-manager" element={<DynamicAdminSubPages />} />
-          <Route path="media-library" element={<MediaLibrary />} />
           <Route path="backups" element={<DynamicAdminSubPages />} />
-          <Route path="activity-logs" element={<DynamicAdminSubPages />} />
           <Route path="profile" element={<DynamicAdminSubPages />} />
         </Route>
       </Routes>

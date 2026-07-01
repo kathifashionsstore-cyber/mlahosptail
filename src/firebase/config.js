@@ -1,6 +1,6 @@
 import { initializeApp } from "firebase/app";
 import { getFirestore } from "firebase/firestore";
-import { getAuth } from "firebase/auth";
+import { browserLocalPersistence, getAuth, setPersistence } from "firebase/auth";
 import { getAnalytics, isSupported } from "firebase/analytics";
 
 const firebaseConfig = {
@@ -18,6 +18,9 @@ const app = initializeApp(firebaseConfig);
 console.log("Firebase initialized. Project ID:", firebaseConfig.projectId);
 const db = getFirestore(app);
 const auth = getAuth(app);
+setPersistence(auth, browserLocalPersistence).catch((error) => {
+  console.warn("Firebase auth persistence could not be set to local:", error);
+});
 console.log("Auth initialized");
 
 // Analytics initialization with environment support check

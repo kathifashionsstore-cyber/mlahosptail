@@ -134,6 +134,16 @@ export function Home() {
   }, [testimonials]);
 
   const primaryPhone = settings?.phoneNumbers?.[0]?.number || "+918647223625";
+  const homeAboutImage = getImageUrl(
+    "home-about-thumbnail",
+    "https://images.unsplash.com/photo-1584515933487-779824d29309?auto=format&fit=crop&w=700&q=80"
+  );
+  const homeStatsBg = getImageUrl("home-stats-bg", "");
+  const homeServicesBg = getImageUrl("home-services-bg", "");
+  const homeCtaImage = getImageUrl(
+    "home-cta-bg",
+    "https://images.unsplash.com/photo-1576091160550-2173dba999ef?auto=format&fit=crop&w=900&q=80"
+  );
 
   return (
     <div className="overflow-hidden bg-white dark:bg-slate-950 transition-colors duration-300">
@@ -204,7 +214,10 @@ export function Home() {
       </section>
 
       {/* 3. Stats Section */}
-      <section className="py-20 px-6 md:px-12 bg-[#0B3C5D] text-white">
+      <section
+        className="py-20 px-6 md:px-12 bg-[#0B3C5D] text-white bg-cover bg-center"
+        style={homeStatsBg ? { backgroundImage: `linear-gradient(rgba(11, 60, 93, 0.88), rgba(11, 60, 93, 0.88)), url(${homeStatsBg})` } : undefined}
+      >
         <div className="max-w-7xl mx-auto space-y-12">
           <div className="text-center max-w-xl mx-auto space-y-3">
             <span className="text-[13px] tracking-[1.5px] font-bold text-[#D81F26] uppercase block">Hospital Stats</span>
@@ -311,7 +324,7 @@ export function Home() {
           <div className="relative w-full max-w-md mx-auto lg:mx-0">
             <div className="absolute -inset-4 bg-[#1E7FC2]/8 rounded-[50%_30%_70%_40%/_50%_60%_30%_60%] pointer-events-none scale-105 z-0 blur-sm" />
             <img
-              src="https://images.unsplash.com/photo-1584515933487-779824d29309?auto=format&fit=crop&w=700&q=80"
+              src={homeAboutImage}
               alt="Hospital Facility"
               className="w-full relative z-10 aspect-[4/3] rounded-[26px] object-cover border-4 border-slate-50 dark:border-slate-900 shadow-md"
             />
@@ -377,7 +390,7 @@ export function Home() {
                     <div className="relative mx-auto w-full max-w-[220px] overflow-hidden rounded-[24px] bg-gradient-to-br from-[#E7F3FA] to-[#EAFBF0] shadow-[0_18px_44px_rgba(15,76,129,0.14)] md:mx-0">
                       <div className="aspect-[4/5]">
                         <img
-                          src={docItem.photoUrl || "https://images.unsplash.com/photo-1622253692010-333f2da6031d?auto=format&fit=crop&w=400&q=80"}
+                          src={getImageUrl(`doctor-photo-${docItem.slug || docItem.id}`, docItem.photoUrl || "https://images.unsplash.com/photo-1622253692010-333f2da6031d?auto=format&fit=crop&w=400&q=80")}
                           alt={docItem.name}
                           className="h-full w-full object-cover transition duration-700 group-hover:scale-110"
                         />
@@ -442,7 +455,10 @@ export function Home() {
       </section>
 
       {/* 6. Services Section: 4-Column Image-on-top style */}
-      <section className="py-20 px-6 md:px-12 bg-[#F4F9FC] dark:bg-slate-900/30 border-y border-slate-100 dark:border-slate-850 transition-colors duration-300">
+      <section
+        className="py-20 px-6 md:px-12 bg-[#F4F9FC] dark:bg-slate-900/30 border-y border-slate-100 dark:border-slate-850 transition-colors duration-300 bg-cover bg-center"
+        style={homeServicesBg ? { backgroundImage: `linear-gradient(rgba(244, 249, 252, 0.92), rgba(244, 249, 252, 0.92)), url(${homeServicesBg})` } : undefined}
+      >
         <div className="max-w-7xl mx-auto space-y-12">
           <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-4">
             <div className="space-y-3">
@@ -470,7 +486,7 @@ export function Home() {
                 }
               };
 
-              const cardImageUrl = getImageUrl(`service-${s.slug}`, s.thumbnailUrl || getClusterFallback(s.cluster));
+              const cardImageUrl = getImageUrl(`service-thumb-${s.slug}`, s.thumbnailUrl || getClusterFallback(s.cluster));
 
               return (
                 <div key={s.id} className="bg-white dark:bg-slate-900 rounded-[14px] overflow-hidden shadow-md border border-slate-100 dark:border-slate-800 flex flex-col justify-between group">
@@ -549,7 +565,7 @@ export function Home() {
           </div>
           <div className="hidden lg:block h-full min-h-[320px] relative overflow-hidden bg-slate-900/10">
             <img
-              src="https://images.unsplash.com/photo-1576091160550-2173dba999ef?auto=format&fit=crop&w=900&q=80"
+              src={homeCtaImage}
               alt="Medical Consultation Clinic"
               className="absolute inset-0 w-full h-full object-cover"
             />

@@ -4,7 +4,7 @@ import { Instagram, Facebook, Youtube, Phone, Mail, MapPin, Clock } from "lucide
 import { useApp } from "../context/AppContext";
 
 export function Footer() {
-  const { settings, services } = useApp();
+  const { settings, services, getImageUrl } = useApp();
 
   const socialLinks = settings?.socialLinks || {};
   const phoneNumbers = settings?.phoneNumbers || [];
@@ -14,15 +14,17 @@ export function Footer() {
   const emergencyHours = settings?.openingHours?.emergency || "24/7, All Days";
   const mapEmbedUrl = settings?.mapEmbedUrl || "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3830.4074712411624!2d80.04671131486043!3d16.235700088780367!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!2f49!3m3!1m2!1s0x3a4b1bb64c679a95%3A0xe5a3eef9386c965b!2sAmulya%20Nursing%20Home!5e0!3m2!1sen!2sin!4v1650000000000!5m2!1sen!2sin";
 
+  const footerLogoUrl = getImageUrl("footer-logo", settings?.logoUrl || "");
+
   return (
     <footer className="bg-[#082A40] text-slate-350 pt-16 pb-24 md:pb-8 border-t border-white/10 transition-colors duration-300">
       <div className="max-w-7xl mx-auto px-6 md:px-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-8 md:gap-10">
         {/* Column 1: Hospital Logo, Tagline & Socials */}
         <div className="space-y-5 lg:col-span-1">
           <Link to="/" className="flex items-center space-x-3.5 group">
-            {settings?.logoUrl ? (
+            {footerLogoUrl ? (
               <img
-                src={settings.logoUrl}
+                src={footerLogoUrl}
                 alt={settings?.hospitalName || "Amulya Nursing Home"}
                 className="w-10 h-10 object-contain rounded-xl bg-white p-0.5"
               />

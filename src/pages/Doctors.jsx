@@ -72,7 +72,7 @@ export function Doctors() {
                   {/* Photo or Circular gradient avatar placeholder */}
                   <div className="w-28 h-28 rounded-full bg-gradient-to-br from-[#1E7FC2] to-[#0B3C5D] flex items-center justify-center flex-shrink-0 text-white shadow-md overflow-hidden relative">
                     <img
-                      src={getImageUrl(`doctor-photo-${docItem.id}`, docItem.photoUrl || "https://images.unsplash.com/photo-1622253692010-333f2da6031d?auto=format&fit=crop&w=400&q=80")}
+                      src={getImageUrl(`doctor-photo-${docItem.slug || docItem.id}`, docItem.photoUrl || "https://images.unsplash.com/photo-1622253692010-333f2da6031d?auto=format&fit=crop&w=400&q=80")}
                       alt={docItem.name}
                       className="w-full h-full object-cover"
                     />

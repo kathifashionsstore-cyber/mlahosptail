@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged, signOut } from "firebase/auth";
+import { signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged, signOut, setPersistence, browserLocalPersistence } from "firebase/auth";
 import { doc, setDoc, getDoc, collection, getDocs, limit, serverTimestamp } from "firebase/firestore";
 import { auth, db } from "../../firebase/config";
 import { useNavigate } from "react-router-dom";
@@ -24,18 +24,23 @@ export function Login() {
       if (user) {
         try {
           console.time("Login Admin Doc Fetch");
-          const adminDocSnap = await withTimeout(getDoc(doc(db, "admins", user.uid)), 1500);
+          const adminDocSnap = await withTimeout(getDoc(doc(db, "admins", user.uid)), 10000);
           console.timeEnd("Login Admin Doc Fetch");
           if (adminDocSnap.exists() && adminDocSnap.data().active === true) {
+            localStorage.setItem("amulyaAdminVerifiedUid", user.uid);
             navigate("/admin");
           } else {
             setError("Your account is not configured as an active administrator.");
+            localStorage.removeItem("amulyaAdminVerifiedUid");
             await signOut(auth);
           }
         } catch (err) {
           console.error("Admin verification on mount failed or timed out:", err);
-          setError("Failed to verify administrative privileges.");
-          await signOut(auth);
+          if (localStorage.getItem("amulyaAdminVerifiedUid") === user.uid) {
+            navigate("/admin");
+          } else {
+            setError("Failed to verify administrative privileges. Please try again.");
+          }
         }
       }
       try {
@@ -50,7 +55,7 @@ export function Login() {
     console.time("Login Bootstrap Check");
     const checkAdmins = async () => {
       try {
-        const querySnap = await withTimeout(getDocs(collection(db, "admins"), limit(1)), 1500);
+        const querySnap = await withTimeout(getDocs(collection(db, "admins"), limit(1)), 10000);
         if (querySnap.empty) {
           // If no admin doc exists in Firestore, allow registration of the first superadmin
           setAllowRegistration(true);
@@ -79,6 +84,7 @@ export function Login() {
     setLoading(true);
 
     try {
+      await setPersistence(auth, browserLocalPersistence);
       const userCredential = await signInWithEmailAndPassword(auth, email, password);
       const user = userCredential.user;
       
@@ -86,9 +92,11 @@ export function Login() {
       const adminDocSnap = await getDoc(adminDocRef);
       
       if (adminDocSnap.exists() && adminDocSnap.data().active === true) {
+        localStorage.setItem("amulyaAdminVerifiedUid", user.uid);
         navigate("/admin");
       } else {
         setError("Your account is not configured as an active administrator.");
+        localStorage.removeItem("amulyaAdminVerifiedUid");
         await signOut(auth);
       }
     } catch (err) {
@@ -114,6 +122,7 @@ export function Login() {
       let user;
       try {
         // 1. Create user in Firebase Auth
+        await setPersistence(auth, browserLocalPersistence);
         const userCredential = await createUserWithEmailAndPassword(auth, email, password);
         user = userCredential.user;
 
@@ -126,12 +135,14 @@ export function Login() {
           createdAt: serverTimestamp(),
           lastLogin: serverTimestamp(),
         });
+        localStorage.setItem("amulyaAdminVerifiedUid", user.uid);
 
         // 3. Navigate to Dashboard
         navigate("/admin");
       } catch (err) {
         if (err.code === "auth/email-already-in-use") {
           // Gracefully sign in and verify or create the admins document
+          await setPersistence(auth, browserLocalPersistence);
           const signInCredential = await signInWithEmailAndPassword(auth, email, password);
           user = signInCredential.user;
 
@@ -139,6 +150,7 @@ export function Login() {
           const adminDocSnap = await getDoc(adminDocRef);
 
           if (adminDocSnap.exists() && adminDocSnap.data().active === true) {
+            localStorage.setItem("amulyaAdminVerifiedUid", user.uid);
             navigate("/admin");
           } else {
             await setDoc(adminDocRef, {
@@ -149,6 +161,7 @@ export function Login() {
               createdAt: serverTimestamp(),
               lastLogin: serverTimestamp(),
             });
+            localStorage.setItem("amulyaAdminVerifiedUid", user.uid);
             navigate("/admin");
           }
         } else {

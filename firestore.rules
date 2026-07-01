@@ -26,6 +26,7 @@ service cloud.firestore {
         "deleteUrl",
         "caption",
         "altText",
+        "categoryTag",
         "updatedAt"
       ])
       && request.resource.data.imageUrl is string
@@ -33,7 +34,8 @@ service cloud.firestore {
       && request.resource.data.imageUrl.size() <= 2048
       && (!("deleteUrl" in request.resource.data) || request.resource.data.deleteUrl is string)
       && (!("caption" in request.resource.data) || request.resource.data.caption is string)
-      && (!("altText" in request.resource.data) || request.resource.data.altText is string);
+      && (!("altText" in request.resource.data) || request.resource.data.altText is string)
+      && (!("categoryTag" in request.resource.data) || request.resource.data.categoryTag is string);
     }
 
     match /siteImages/{slotId} {
@@ -106,7 +108,9 @@ service cloud.firestore {
         "galleryImages",
         "welcomeBanner",
         "festivalBanners",
-        "seoSettings"
+        "seoSettings",
+        "announcements",
+        "themeHistory"
       ];
       allow write: if isAdmin();
     }

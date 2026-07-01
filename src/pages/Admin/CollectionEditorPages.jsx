@@ -275,25 +275,23 @@ export function AdminBlog() {
   );
 }
 
-export function AdminHeroBanners() {
+export function AdminReviewsQueue() {
   return (
     <AdminCollectionEditor
-      collectionName="heroSlides"
-      title="Hero Banners"
-      description="Manage homepage hero slides, image upload, CTA text, scheduling, and overlay opacity."
+      collectionName="testimonials"
+      title="Reviews Queue"
+      description="Moderate patient reviews, approval status, ratings, treatment tags, and patient photos."
       fields={[
-        { name: "imageUrl", label: "Hero Image URL / Upload", type: "image", wide: true },
-        { name: "heading", label: "Heading", type: "text", required: true },
-        { name: "subheading", label: "Subheading", type: "textarea", wide: true },
-        { name: "badgeText", label: "Badge Text", type: "text" },
-        { name: "ctaText", label: "CTA Text", type: "text", default: "Book Appointment" },
-        { name: "ctaLink", label: "CTA Link", type: "text", default: "/book-appointment" },
-        { name: "overlayOpacity", label: "Overlay Opacity (0.0 to 1.0)", type: "number", default: 0.15, help: "Controls overlay darkness over the slide image." },
-        { name: "publishDate", label: "Publish Date", type: "date", help: "Schedule slide to appear on/after this date." },
-        { name: "expiryDate", label: "Expiry Date", type: "date", help: "Schedule slide to expire on/after this date." },
-        ...activeOrderFields,
+        { name: "photoUrl", label: "Patient Photo URL / Upload", type: "image", wide: true },
+        { name: "patientName", label: "Patient Name", type: "text", required: true },
+        { name: "reviewText", label: "Review Text", type: "textarea", wide: true, required: true },
+        { name: "rating", label: "Rating", type: "number", default: 5 },
+        { name: "treatmentTaken", label: "Treatment Taken", type: "text" },
+        { name: "isApproved", label: "Approved", type: "checkbox", default: false, checkboxLabel: "Visible on public site" },
+        { name: "isActive", label: "Active", type: "checkbox", default: true, checkboxLabel: "Keep in review queue" },
+        { name: "order", label: "Order", type: "number", default: 1 },
       ]}
-      idField="heading"
+      idField="patientName"
     />
   );
 }
@@ -315,25 +313,6 @@ export function AdminFestivalBanners() {
         ...activeOrderFields,
       ]}
       idField="title"
-    />
-  );
-}
-
-export function AdminSEOSettings() {
-  return (
-    <AdminCollectionEditor
-      collectionName="seoSettings"
-      title="SEO Settings"
-      description="Manage page-level SEO titles, descriptions, keywords, and social sharing images."
-      fields={[
-        { name: "imageUrl", label: "Share Image URL / Upload", type: "image", wide: true },
-        { name: "page", label: "Page Path", type: "text", required: true },
-        { name: "title", label: "Meta Title", type: "text", required: true },
-        { name: "description", label: "Meta Description", type: "textarea", wide: true },
-        { name: "keywords", label: "Keywords", type: "text" },
-        ...activeOrderFields,
-      ]}
-      idField="page"
     />
   );
 }

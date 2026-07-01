@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Link, NavLink, useLocation } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { Search, Sun, Moon, Phone, ChevronDown, Facebook, Instagram, Mail, MapPin, Menu, X } from "lucide-react";
+import { Search, Sun, Moon, Phone, ChevronDown, Menu, X } from "lucide-react";
 import { useApp } from "../context/AppContext";
 import { SearchOverlay } from "./SearchOverlay";
 
@@ -42,7 +42,6 @@ export function Navbar() {
 
   const emergencyPhone = settings?.phoneNumbers?.find((p) => p.label === "Hospital")?.number || "+91 8647223625";
   const isHomePage = location.pathname === "/";
-  const socialLinks = settings?.socialLinks || {};
 
   const toggleDropdown = (menuName) => {
     setActiveDropdown((prev) => (prev === menuName ? null : menuName));
@@ -77,42 +76,6 @@ export function Navbar() {
   return (
     <>
       <header className="fixed top-0 left-0 right-0 z-50 transition-all duration-300 fixed-nav-offset" ref={dropdownRef}>
-        
-        {/* Topbar Info Line */}
-        <div className="bg-[#082A40] text-slate-350 py-2 px-6 md:px-8 flex justify-between items-center text-[11px] font-bold tracking-wide border-b border-white/5 relative z-50">
-          <div className="flex items-center space-x-6">
-            <span className="flex items-center space-x-1.5 text-white/95">
-              <Mail className="w-3.5 h-3.5 text-[#1E7FC2]" />
-              <span>amulyanursinghome@gmail.com</span>
-            </span>
-            <span className="hidden lg:flex items-center space-x-1.5 text-white/95">
-              <MapPin className="w-3.5 h-3.5 text-[#1E7FC2]" />
-              <span>Guntur Road, Narasaraopet</span>
-            </span>
-          </div>
-          <div className="flex items-center space-x-4">
-            <a
-              href={`tel:${emergencyPhone}`}
-              className="flex items-center space-x-1.5 text-white hover:text-[#1E7FC2] font-bold transition-colors"
-            >
-              <Phone className="w-3.5 h-3.5 text-[#D81F26]" />
-              <span>OPD Call: {emergencyPhone}</span>
-            </a>
-            <div className="flex items-center space-x-2 border-l border-white/10 pl-3">
-              {socialLinks.facebook && (
-                <a href={socialLinks.facebook} target="_blank" rel="noopener noreferrer" className="text-slate-400 hover:text-white">
-                  <Facebook className="w-3.5 h-3.5" />
-                </a>
-              )}
-              {socialLinks.instagram && (
-                <a href={socialLinks.instagram} target="_blank" rel="noopener noreferrer" className="text-slate-400 hover:text-white">
-                  <Instagram className="w-3.5 h-3.5" />
-                </a>
-              )}
-            </div>
-          </div>
-        </div>
-
         {/* Main Header Row */}
         <nav
           className={`transition-all duration-300 border-b relative z-50 ${
@@ -472,7 +435,7 @@ export function Navbar() {
               animate={{ x: 0 }}
               exit={{ x: "100%" }}
               transition={{ type: "tween", duration: 0.25 }}
-              className="fixed inset-0 top-[108px] bg-white dark:bg-slate-900 z-40 overflow-y-auto px-6 py-6 flex flex-col justify-between"
+              className="public-mobile-drawer fixed inset-0 top-[80px] bg-white dark:bg-slate-900 z-40 overflow-y-auto px-6 py-6 flex flex-col justify-between"
             >
               <div className="space-y-6">
                 {/* Main Navigation Links */}
