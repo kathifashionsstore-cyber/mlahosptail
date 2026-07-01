@@ -1,0 +1,27 @@
+# Advanced Routes & Visual Identity Implementation
+
+- [ ] Create Brand & Story pages
+  - [ ] Implement `src/pages/OurStory.jsx` with timeline animations and image reveals
+  - [ ] Implement `src/pages/Leadership.jsx` with executive profiles and biography panels
+  - [ ] Implement `src/pages/Facilities.jsx` with OT/ICU detail blocks and virtual tour hotspot widget
+  - [ ] Implement `src/pages/PatientStories.jsx` with recovery journey comparisons
+- [ ] Create Specialty and Department routing
+  - [ ] Implement `src/pages/DepartmentDetail.jsx` dynamically rendering unique layout formats (Orthopaedics, Spine, Joints, Sports, Trauma, Physiotherapy, Pain, Pediatrics)
+  - [ ] Implement department index landing page listing specialties
+- [ ] Create Patient Care and Careers portals
+  - [ ] Implement `src/pages/PatientCare.jsx` supporting tabs (International patients, Cashback insurance, Packages, FAQs)
+  - [ ] Implement `src/pages/Careers.jsx` displaying job boards and submit forms
+- [ ] Create Contact and Media splits
+  - [ ] Implement `src/pages/ContactLocations.jsx` with branch map finding and emergency contacts
+  - [ ] Implement `src/pages/VideoConsultation.jsx` with tele-consult booking steps
+  - [ ] Implement utility routes in `src/pages/UtilityPages.jsx` (privacy, terms, refund, accessibility, sitemap)
+- [ ] Integrate routing and layouts
+  - [ ] Update `src/App.jsx` to register all new public routes
+  - [ ] Update `src/components/Navbar.jsx` to link the new subroutes in mega-menus
+  - [ ] Update `src/components/Footer.jsx` to link sitemaps and legal terms
+- [ ] Implement new Admin Dashboard sub-pages
+  - [ ] Update `src/pages/Admin/AdminLayout.jsx` sidebar to support new pages
+  - [ ] Expand settings/editors in Admin files to support the new section forms
+- [ ] Verify build and functionality
+  - [ ] Run `npm run build` to confirm zero compilation errors
+  - [ ] Run `npm run lint` to verify clean build

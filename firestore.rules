@@ -1,0 +1,126 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function signedIn() {
+      return request.auth != null;
+    }
+
+    function adminDoc() {
+      return /databases/$(database)/documents/admins/$(request.auth.uid);
+    }
+
+    function isAdmin() {
+      return signedIn()
+        && exists(adminDoc())
+        && get(adminDoc()).data.active == true;
+    }
+
+    function publishedOrAdmin(flagName) {
+      return isAdmin() || resource.data[flagName] == true;
+    }
+
+    function validSiteImagePayload() {
+      return request.resource.data.keys().hasOnly([
+        "imageUrl",
+        "deleteUrl",
+        "caption",
+        "altText",
+        "updatedAt"
+      ])
+      && request.resource.data.imageUrl is string
+      && request.resource.data.imageUrl.size() > 0
+      && request.resource.data.imageUrl.size() <= 2048
+      && (!("deleteUrl" in request.resource.data) || request.resource.data.deleteUrl is string)
+      && (!("caption" in request.resource.data) || request.resource.data.caption is string)
+      && (!("altText" in request.resource.data) || request.resource.data.altText is string);
+    }
+
+    match /siteImages/{slotId} {
+      allow read: if true;
+      allow create, update: if isAdmin() && validSiteImagePayload();
+      allow delete: if isAdmin();
+    }
+
+    match /admins/{adminId} {
+      allow get: if signedIn() && (request.auth.uid == adminId || isAdmin());
+      allow list, create, update, delete: if isAdmin();
+    }
+
+    match /appointments/{appointmentId} {
+      allow create: if true;
+      allow read, update, delete: if isAdmin();
+    }
+
+    match /enquiries/{enquiryId} {
+      allow create: if true;
+      allow read, update, delete: if isAdmin();
+    }
+
+    match /pageViews/{viewId} {
+      allow create: if true;
+      allow read, update, delete: if isAdmin();
+    }
+
+    match /testimonials/{testimonialId} {
+      allow read: if publishedOrAdmin("isApproved");
+      allow create: if request.resource.data.isApproved == false;
+      allow update, delete: if isAdmin();
+    }
+
+    match /blogs/{blogId} {
+      allow read: if publishedOrAdmin("isPublished");
+      allow update: if isAdmin() || (
+        request.resource.data.diff(resource.data).affectedKeys().hasOnly(["views"])
+        && request.resource.data.views is int
+        && request.resource.data.views >= resource.data.views
+      );
+      allow create, delete: if isAdmin();
+    }
+
+    match /galleryAlbums/{albumId} {
+      allow read: if publishedOrAdmin("isActive");
+      allow write: if isAdmin();
+
+      match /images/{imageId} {
+        allow read: if isAdmin() || resource.data.isActive != false;
+        allow write: if isAdmin();
+      }
+    }
+
+    match /{collectionId}/{docId} {
+      allow read: if collectionId in [
+        "siteSettings",
+        "aboutContent",
+        "awards",
+        "statistics",
+        "whyChooseUs",
+        "departments",
+        "doctors",
+        "heroSlides",
+        "serviceCategories",
+        "treatments",
+        "services",
+        "insurancePartners",
+        "faqs",
+        "galleryImages",
+        "welcomeBanner",
+        "festivalBanners",
+        "seoSettings"
+      ];
+      allow write: if isAdmin();
+    }
+
+    match /mediaLibrary/{mediaId} {
+      allow read, write: if isAdmin();
+    }
+
+    match /auditLogs/{logId} {
+      allow read, write: if isAdmin();
+    }
+
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
