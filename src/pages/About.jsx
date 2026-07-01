@@ -7,7 +7,7 @@ import { doc, getDoc, collection, getDocs, query, where, orderBy } from "firebas
 import { useApp } from "../context/AppContext";
 
 export function About() {
-  const { doctors, getImageUrl } = useApp();
+  const { doctors, getImageUrl, settings } = useApp();
   const [aboutContent, setAboutContent] = useState(null);
   const [awards, setAwards] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -61,19 +61,19 @@ export function About() {
   return (
     <div className="pt-24 min-h-screen">
       <Helmet>
-        <title>About Us | Amulya Hospital | Narasaraopet</title>
+        <title>About Us | {settings?.hospitalName || "Amulya Nursing Home"} | Narasaraopet</title>
         <meta
           name="description"
-          content="Learn about Amulya Hospital (Amulya Nursing Home), providing premium orthopaedic, spine, joint replacements, and trauma care in Narasaraopet since 1992."
+          content={`Learn about ${settings?.hospitalName || "Amulya Nursing Home"}, providing premium orthopaedic, spine, joint replacements, and trauma care in Narasaraopet since 1992.`}
         />
-        <meta name="keywords" content="about amulya hospital, amulya nursing home history, orthopaedic hospital narasaraopet, dr chadavalada aravinda babu" />
+        <meta name="keywords" content={`about ${settings?.hospitalName?.toLowerCase() || "amulya nursing home"}, amulya nursing home history, orthopaedic hospital narasaraopet, dr chadavalada aravinda babu`} />
         <link rel="canonical" href={window.location.href} />
       </Helmet>
       {/* 1. Header Banner */}
       <section className="premium-banner text-white py-16 px-6 md:px-12">
         <div className="max-w-7xl mx-auto space-y-3">
           <span className="text-xs uppercase font-extrabold tracking-widest text-[#3FA535] dark:text-[#3FA535]">About Hospital</span>
-          <h1 className="text-3xl md:text-5xl font-extrabold tracking-tight font-serif">About Amulya Nursing Home</h1>
+          <h1 className="text-3xl md:text-5xl font-extrabold tracking-tight font-serif">About {settings?.hospitalName || "Amulya Nursing Home"}</h1>
           <p className="text-sm md:text-base text-slate-200 max-w-2xl font-medium">
             Over three decades of surgical excellence, trauma relief, and orthopedic restoration.
           </p>

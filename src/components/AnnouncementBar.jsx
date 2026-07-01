@@ -13,7 +13,7 @@ function resolveAnnouncementText(item) {
 }
 
 export function AnnouncementBar() {
-  const { announcements, announcementSettings } = useApp();
+  const { announcements, announcementSettings, settings } = useApp();
   
   const [currentIndex, setCurrentIndex] = useState(0);
   const [opacity, setOpacity] = useState(1);
@@ -32,10 +32,10 @@ export function AnnouncementBar() {
   const activeAnnouncements = (announcements || []).filter(a => a.isActive !== false);
 
   const fallbackItems = useMemo(() => [
-    { text: "🏥 Amulya Hospital — Spine, Joint & Trauma Care | Narasaraopet" },
+    { text: `🏥 ${settings?.hospitalName || "Amulya Nursing Home"} — Spine, Joint & Trauma Care | Narasaraopet` },
     { text: "📞 OPD: +91 8647223625 | Mon–Sat 9AM–6PM" },
     { text: "🌐 Website by WayzenTech | 9398724704" }
-  ], []);
+  ], [settings?.hospitalName]);
 
   const normalizedActiveItems = useMemo(() => (
     activeAnnouncements

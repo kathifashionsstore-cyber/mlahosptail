@@ -98,7 +98,7 @@ export function Navbar() {
               </div>
               <div className="text-left">
                 <span className={`font-extrabold text-sm md:text-base tracking-tight block ${isScrolled ? "text-white font-serif" : "text-[#0B3C5D] dark:text-white font-serif"}`}>
-                  Amulya Hospital
+                  {settings?.hospitalName || "Amulya Nursing Home"}
                 </span>
                 <span className="text-[8px] uppercase font-extrabold tracking-widest block text-[#D81F26] mt-0.5">
                   Spine, Joint & Trauma Care
@@ -206,7 +206,7 @@ export function Navbar() {
                       <div className="space-y-3">
                         <span className="text-[10px] uppercase font-bold text-[#D81F26] tracking-wider block">Hospital Story</span>
                         <p className="text-xs text-[#5C6E7A] dark:text-slate-400 font-semibold leading-relaxed">
-                          Amulya Hospital has anchored trauma care in Guntur and Palnadu since 1992 under chief surgeon Dr. Chadalavada Aravinda Babu.
+                          {settings?.hospitalName || "Amulya Nursing Home"} has anchored trauma care in Guntur and Palnadu since 1992 under chief surgeon Dr. Chadalavada Aravinda Babu.
                         </p>
                       </div>
                       <div className="flex flex-col space-y-3 text-xs font-extrabold text-[#0B3C5D] dark:text-slate-350">

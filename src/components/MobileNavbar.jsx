@@ -136,7 +136,9 @@ export function MobileNavbar() {
               {/* Header */}
               <div className="flex items-center justify-between p-5 border-b border-slate-100 dark:border-slate-800">
                 <div>
-                  <h3 className="font-extrabold text-slate-800 dark:text-slate-50 font-serif">Amulya NH</h3>
+                  <h3 className="font-extrabold text-slate-800 dark:text-slate-50 font-serif">
+                    {settings?.hospitalName || "Amulya Nursing Home"}
+                  </h3>
                   <p className="text-[10px] text-slate-400 dark:text-slate-500 uppercase tracking-widest font-bold">
                     Hospital Menu
                   </p>

@@ -510,7 +510,7 @@ export function ThemeManager() {
 
               {/* Footer */}
               <div className="p-3 bg-slate-950 text-slate-500 text-[8px] flex justify-between border-t border-slate-800">
-                <span>© 2026 Amulya Hospital</span>
+                <span>© 2026 {settings?.hospitalName || "Amulya Nursing Home"}</span>
                 <span className="text-white/40">Website by WayzenTech</span>
               </div>
             </div>

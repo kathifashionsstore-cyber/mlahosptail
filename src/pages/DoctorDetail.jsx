@@ -9,7 +9,7 @@ import { useDoctorPhoto } from "../hooks/useDoctorPhoto";
 
 export function DoctorDetail() {
   const { doctorId } = useParams();
-  const { doctors, treatments, getImageUrl } = useApp();
+  const { doctors, treatments, getImageUrl, settings } = useApp();
   const [doctor, setDoctor] = useState(null);
   const [loading, setLoading] = useState(true);
   const doctorPhoto = useDoctorPhoto(doctor);
@@ -74,12 +74,12 @@ export function DoctorDetail() {
   return (
     <div className="pt-24 min-h-screen bg-white dark:bg-slate-950 transition-colors duration-300">
       <Helmet>
-        <title>{`Dr. ${doctor.name} | ${doctor.designation || 'Orthopaedic Specialist'} | Amulya Hospital`}</title>
+        <title>{`Dr. ${doctor.name} | ${doctor.designation || 'Orthopaedic Specialist'} | ${settings?.hospitalName || "Amulya Nursing Home"}`}</title>
         <meta
           name="description"
-          content={`Consult Dr. ${doctor.name}, ${doctor.designation || 'specialist surgeon'} at Amulya Hospital, Narasaraopet. Specializing in ${doctor.speciality || 'orthopaedics and trauma care'}. Experience: ${doctor.experience || 'Over 20 Years'}. Book appointment online.`}
+          content={`Consult Dr. ${doctor.name}, ${doctor.designation || 'specialist surgeon'} at ${settings?.hospitalName || "Amulya Nursing Home"}, Narasaraopet. Specializing in ${doctor.speciality || 'orthopaedics and trauma care'}. Experience: ${doctor.experience || 'Over 20 Years'}. Book appointment online.`}
         />
-        <meta name="keywords" content={`Dr. ${doctor.name}, orthopedic surgeon narasaraopet, spine doctor amulya hospital, best trauma surgeon palnadu`} />
+        <meta name="keywords" content={`Dr. ${doctor.name}, orthopedic surgeon narasaraopet, spine doctor ${settings?.hospitalName || "Amulya Nursing Home"}, best trauma surgeon palnadu`} />
         <link rel="canonical" href={window.location.href} />
         
         {/* Physician JSON-LD Schema */}
@@ -95,7 +95,7 @@ export function DoctorDetail() {
             "medicalSpecialty": doctor.speciality || "OrthopedicSurgery",
             "worksFor": {
               "@type": "Hospital",
-              "name": "Amulya Nursing Home",
+              "name": settings?.hospitalName || "Amulya Nursing Home",
               "address": {
                 "@type": "PostalAddress",
                 "streetAddress": "30/13, Guntur Rd, Panasathota, Barampet",

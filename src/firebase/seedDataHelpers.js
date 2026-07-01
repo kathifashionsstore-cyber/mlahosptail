@@ -133,7 +133,7 @@ const GALLERY_ALBUMS_DATA = [
 ];
 
 const GALLERY_IMAGES_DATA = [
-  { id: "hospital-exterior-main", albumId: "hospital-infrastructure", category: "Hospital", imageUrl: HERO_IMAGES[0], caption: "Amulya Nursing Home patient care facility", altText: "Amulya hospital building and patient care facility", order: 1, isActive: true, status: "published", isFeatured: true },
+  { id: "hospital-exterior-main", albumId: "hospital-infrastructure", category: "Hospital", imageUrl: HERO_IMAGES[0], caption: "Amulya Nursing Home patient care facility", altText: "Amulya nursing home building and patient care facility", order: 1, isActive: true, status: "published", isFeatured: true },
   { id: "operation-theatre-main", albumId: "operation-theatres", category: "Operation Theatre", imageUrl: HERO_IMAGES[3], caption: "Advanced orthopaedic operation theatre support", altText: "Modern orthopaedic operation theatre", order: 2, isActive: true, status: "published", isFeatured: true },
   { id: "diagnostic-support-main", albumId: "icu-and-diagnostics", category: "Emergency", imageUrl: HERO_IMAGES[2], caption: "Emergency and diagnostic support services", altText: "Emergency and diagnostic hospital support", order: 3, isActive: true, status: "published", isFeatured: false },
 ];
@@ -146,7 +146,7 @@ const WELCOME_BANNER_DATA = [
     backgroundVideoUrl: "",
     logoUrl: "/logo.png",
     kicker: "Welcome to",
-    heading: "Amulya Hospital",
+    heading: "Amulya Nursing Home",
     subheading: "Spine, Joint & Trauma Care",
     tagline: "Your Health, Our Commitment",
     developerCredit: "Website Designed & Developed by WayZenTech",

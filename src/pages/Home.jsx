@@ -148,16 +148,16 @@ export function Home() {
   return (
     <div className="overflow-hidden bg-white dark:bg-slate-950 transition-colors duration-300">
       <Helmet>
-        <title>{settings?.hospitalName || "Amulya Hospital"} | Spine, Joint & Trauma Care</title>
+        <title>{settings?.hospitalName || "Amulya Nursing Home"} | Spine, Joint & Trauma Care</title>
         <meta
           name="description"
-          content={settings?.tagline ? `${settings.hospitalName} - ${settings.tagline}. Located at ${settings.address || 'Narasaraopet, Palnadu District'}.` : "Amulya Hospital provides orthopaedic, spine, joint, trauma, emergency, and rehabilitation care in Narasaraopet."}
+          content={settings?.tagline ? `${settings.hospitalName} - ${settings.tagline}. Located at ${settings.address || 'Narasaraopet, Palnadu District'}.` : `${settings?.hospitalName || "Amulya Nursing Home"} provides orthopaedic, spine, joint, trauma, emergency, and rehabilitation care in Narasaraopet.`}
         />
         <meta name="keywords" content="hospital in narasaraopet, orthopaedic hospital near me, spine specialist near me, joint replacement hospital, trauma care 24/7, amulya nursing home, best hospital in narasaraopet, palnadu hospital, nearby hospital" />
         
         {/* Open Graph */}
-        <meta property="og:title" content={`${settings?.hospitalName || "Amulya Hospital"} | Spine, Joint & Trauma Care`} />
-        <meta property="og:description" content="Amulya Hospital provides orthopaedic, spine, joint, trauma, emergency, and rehabilitation care in Narasaraopet." />
+        <meta property="og:title" content={`${settings?.hospitalName || "Amulya Nursing Home"} | Spine, Joint & Trauma Care`} />
+        <meta property="og:description" content={`${settings?.hospitalName || "Amulya Nursing Home"} provides orthopaedic, spine, joint, trauma, emergency, and rehabilitation care in Narasaraopet.`} />
         <meta property="og:type" content="website" />
         <meta property="og:url" content={window.location.origin} />
         <meta property="og:image" content={settings?.logoUrl || `${window.location.origin}/logo.png`} />
@@ -389,7 +389,7 @@ export function Home() {
 
           {/* Right Column: Info */}
           <div className="space-y-6">
-            <span className="text-[13px] tracking-[1.5px] font-bold text-[#D81F26] uppercase block">About Amulya Hospital</span>
+            <span className="text-[13px] tracking-[1.5px] font-bold text-[#D81F26] uppercase block">About {settings?.hospitalName || "Amulya Nursing Home"}</span>
             <h2 className="text-3xl md:text-4xl font-extrabold text-[#0B3C5D] dark:text-white font-serif leading-tight">
               33 Years of Dedicated Clinical Restoration
             </h2>

@@ -210,7 +210,7 @@ export function AdminWelcomeBanner() {
         { name: "backgroundVideoUrl", label: "Background Video URL", type: "text", wide: true },
         { name: "logoUrl", label: "Logo URL / Upload", type: "image", wide: true },
         { name: "kicker", label: "Kicker", type: "text", default: "Welcome to" },
-        { name: "heading", label: "Heading", type: "text", default: "Amulya Hospital", required: true },
+        { name: "heading", label: "Heading", type: "text", default: "Amulya Nursing Home", required: true },
         { name: "subheading", label: "Sub Heading", type: "text", default: "Spine, Joint & Trauma Care" },
         { name: "tagline", label: "Tagline", type: "text", default: "Your Health, Our Commitment" },
         { name: "developerCredit", label: "Developer Credit", type: "text", default: "Website Designed & Developed by WayZenTech" },

@@ -8,7 +8,7 @@ import { Calendar, Eye, User, BookOpen, ChevronLeft } from "lucide-react";
 
 export function Blog() {
   const { slug } = useParams();
-  const { getImageUrl } = useApp();
+  const { getImageUrl, settings } = useApp();
   const [blogs, setBlogs] = useState([]);
   const [blog, setBlog] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -91,8 +91,8 @@ export function Blog() {
   // --- DETAIL VIEW ---
   if (slug && blog) {
     const pubDate = getFormattedDate(blog.publishedAt);
-    const metaTitle = blog.seoTitle || `${blog.title} | Amulya Hospital Blog`;
-    const metaDescription = blog.seoDescription || blog.excerpt || "Read health articles from Amulya Nursing Home.";
+    const metaTitle = blog.seoTitle || `${blog.title} | ${settings?.hospitalName || "Amulya Nursing Home"} Blog`;
+    const metaDescription = blog.seoDescription || blog.excerpt || `Read health articles from ${settings?.hospitalName || "Amulya Nursing Home"}.`;
 
     return (
       <div className="pt-24 min-h-screen bg-white dark:bg-slate-950 transition-colors duration-300">
@@ -173,7 +173,7 @@ export function Blog() {
       <section className="premium-banner text-white py-16 px-6 md:px-12 relative overflow-hidden">
         <div className="max-w-7xl mx-auto space-y-3 relative z-10">
           <span className="text-xs uppercase font-extrabold tracking-widest text-[#D81F26]">Health Resources</span>
-          <h1 className="text-3xl md:text-5xl font-extrabold font-serif tracking-tight">Amulya Health Blog</h1>
+          <h1 className="text-3xl md:text-5xl font-extrabold font-serif tracking-tight">{settings?.hospitalName || "Amulya Nursing Home"} Blog</h1>
           <p className="text-sm md:text-base text-slate-200 max-w-2xl font-medium">
             Read clinical insights, preventative guidelines, and bone health advice from our chief surgeons.
           </p>

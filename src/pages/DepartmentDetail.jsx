@@ -115,7 +115,7 @@ const departmentConfigs = {
 
 export function DepartmentDetail() {
   const { deptSlug } = useParams();
-  const { doctors, treatments } = useApp();
+  const { doctors, treatments, settings } = useApp();
 
   const config = departmentConfigs[deptSlug] || departmentConfigs["orthopaedics"];
   
@@ -134,10 +134,10 @@ export function DepartmentDetail() {
   return (
     <div className="pt-24 min-h-screen bg-surface-light dark:bg-surface-dark transition-colors duration-300">
       <Helmet>
-        <title>{`${config.name} | Amulya Hospital | Narasaraopet`}</title>
+        <title>{`${config.name} | ${settings?.hospitalName || "Amulya Nursing Home"} | Narasaraopet`}</title>
         <meta
           name="description"
-          content={`${config.name} at Amulya Hospital: ${config.overview} Located in Narasaraopet, Palnadu. Expert treatment, modular surgical theaters, and rehabilitative care.`}
+          content={`${config.name} at ${settings?.hospitalName || "Amulya Nursing Home"}: ${config.overview} Located in Narasaraopet, Palnadu. Expert treatment, modular surgical theaters, and rehabilitative care.`}
         />
         <meta name="keywords" content={`${config.name} narasaraopet, orthopedic hospital, spine surgery, joint replacement, amulya nursing home specialty`} />
         <link rel="canonical" href={window.location.href} />

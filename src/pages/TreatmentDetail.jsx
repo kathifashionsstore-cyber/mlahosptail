@@ -8,7 +8,7 @@ import DetailTemplate from "../components/DetailTemplate";
 
 export function TreatmentDetail() {
   const { slug } = useParams();
-  const { treatments } = useApp();
+  const { treatments, settings } = useApp();
   const [treatment, setTreatment] = useState(null);
   const [loading, setLoading] = useState(true);
 
@@ -59,7 +59,7 @@ export function TreatmentDetail() {
   return (
     <>
       <Helmet>
-        <title>{treatment.name} | Amulya Hospital</title>
+        <title>{treatment.name} | {settings?.hospitalName || "Amulya Nursing Home"}</title>
         <meta name="description" content={treatment.shortDescription || treatment.description} />
       </Helmet>
       <DetailTemplate item={treatment} type="treatment" />

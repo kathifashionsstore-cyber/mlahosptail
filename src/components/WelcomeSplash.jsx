@@ -99,7 +99,7 @@ export function WelcomeSplash() {
           className="fixed inset-0 z-[90] overflow-hidden bg-[#061923] text-white"
           role="dialog"
           aria-modal="true"
-          aria-label="Welcome to Amulya Hospital"
+          aria-label={`Welcome to ${settings?.hospitalName || "Amulya Nursing Home"}`}
         >
           {banner.backgroundVideoUrl ? (
             <video
@@ -149,7 +149,7 @@ export function WelcomeSplash() {
                 className="mx-auto mb-6 flex h-24 w-24 items-center justify-center rounded-[24px] border border-white/30 bg-white p-3 shadow-[0_20px_50px_rgba(0,0,0,0.25)]"
               >
                 {logoUrl ? (
-                  <img src={logoUrl} alt="Amulya Hospital" className="h-full w-full object-contain" />
+                  <img src={logoUrl} alt={settings?.hospitalName || "Amulya Nursing Home"} className="h-full w-full object-contain" />
                 ) : (
                   <Activity className="h-12 w-12 text-[#0B7D6B]" />
                 )}
@@ -159,7 +159,7 @@ export function WelcomeSplash() {
                 {banner.kicker || "Welcome to"}
               </p>
               <h1 className="mt-3 text-4xl font-extrabold leading-tight tracking-normal md:text-6xl">
-                {banner.heading || "Amulya Hospital"}
+                {banner.heading || settings?.hospitalName || "Amulya Nursing Home"}
               </h1>
               <p className="mt-3 text-base font-bold text-sky-100 md:text-xl">
                 {banner.subheading || "Spine, Joint & Trauma Care"}

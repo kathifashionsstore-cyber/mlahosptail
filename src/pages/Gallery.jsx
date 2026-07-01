@@ -15,6 +15,7 @@ import {
 } from "lucide-react";
 import { db } from "../firebase/config";
 import { buildSeedPlan } from "../firebase/seedDataHelpers";
+import { useApp } from "../context/AppContext";
 
 const fallbackGallery =
   buildSeedPlan().collections.find((item) => item.collectionName === "galleryImages")?.data || [];
@@ -28,6 +29,7 @@ function getImageCategory(item) {
 }
 
 export function Gallery() {
+  const { settings } = useApp();
   const [images, setImages] = useState([]);
   const [loading, setLoading] = useState(true);
   const [activeCategory, setActiveCategory] = useState("All");
@@ -172,10 +174,10 @@ export function Gallery() {
   return (
     <div className="min-h-screen bg-[#07131C] text-white transition-colors duration-300">
       <Helmet>
-        <title>Gallery | Amulya Hospital</title>
+        <title>Gallery | {settings?.hospitalName || "Amulya Nursing Home"}</title>
         <meta
           name="description"
-          content="Explore Amulya Hospital's live media gallery with facilities, emergency care, operation theatre, and hospital moments."
+          content={`Explore ${settings?.hospitalName || "Amulya Nursing Home"}'s live media gallery with facilities, emergency care, operation theatre, and hospital moments.`}
         />
       </Helmet>
 
@@ -282,7 +284,7 @@ export function Gallery() {
                       </span>
                     )}
                   </div>
-                  {item.caption && item.caption !== "Amulya Hospital" && (
+                  {item.caption && item.caption !== "Amulya Hospital" && item.caption !== "Amulya Nursing Home" && item.caption !== settings?.hospitalName && (
                     <div className="absolute inset-x-0 bottom-0 translate-y-2 p-5 opacity-0 transition duration-300 group-hover:translate-y-0 group-hover:opacity-100">
                       <div className="rounded-2xl border border-white/15 bg-white/15 p-4 backdrop-blur-xl">
                         <h3 className="text-sm font-extrabold text-white">{item.caption}</h3>

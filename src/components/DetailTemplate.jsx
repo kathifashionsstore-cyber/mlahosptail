@@ -318,7 +318,7 @@ export function DetailTemplate({ item, type = "service" }) {
             <div className="space-y-2">
               <span className="text-[10px] uppercase font-extrabold text-[#1E7FC2] tracking-widest block">Clinical screening workflows</span>
               <h2 className="text-2xl md:text-3xl font-serif font-extrabold text-[#0B3C5D] dark:text-white">How We Diagnose It</h2>
-              <p className="text-xs font-semibold text-slate-400 max-w-xl">Diagnostic procedures used at Amulya Hospital to verify structural conditions:</p>
+              <p className="text-xs font-semibold text-slate-400 max-w-xl">Diagnostic procedures used at {settings?.hospitalName || "Amulya Nursing Home"} to verify structural conditions:</p>
             </div>
             
             {/* Timeline style diagnostic step grids */}

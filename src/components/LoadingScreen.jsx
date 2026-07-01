@@ -1,7 +1,16 @@
 import React from "react";
 import { motion } from "framer-motion";
+import { useApp } from "../context/AppContext";
 
 export function LoadingScreen({ size = "full" }) {
+  let settings = null;
+  try {
+    const context = useApp();
+    settings = context?.settings;
+  } catch (e) {
+    // fallback
+  }
+  const hospitalName = settings?.hospitalName || "Amulya Nursing Home";
   const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
   // Drawing animation properties
@@ -152,7 +161,7 @@ export function LoadingScreen({ size = "full" }) {
       {/* Hospital Credentials lockup */}
       <div className="text-center mt-8 space-y-2 select-none">
         <h1 className="text-xl md:text-2xl font-serif font-extrabold tracking-tight text-[#0B3C5D] dark:text-white">
-          Amulya Hospital
+          {hospitalName}
         </h1>
         <p className="text-[9px] md:text-[10px] uppercase tracking-[0.25em] font-extrabold text-[#D81F26] dark:text-[#D81F26] mt-1">
           Spine, Joint & Trauma Care

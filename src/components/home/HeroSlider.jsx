@@ -145,13 +145,13 @@ export function HeroSlider() {
   const renderPlaceholder = () => (
     <div className="w-full h-full bg-[#07365A] flex flex-col items-center justify-center p-8 select-none">
       {settings?.logoUrl ? (
-        <img src={settings.logoUrl} alt="Amulya Hospital Logo" className="w-16 h-16 object-contain rounded-full bg-white p-2 shadow-lg mb-3" />
+        <img src={settings.logoUrl} alt={`${settings?.hospitalName || "Amulya Nursing Home"} Logo`} className="w-16 h-16 object-contain rounded-full bg-white p-2 shadow-lg mb-3" />
       ) : (
         <div className="w-16 h-16 rounded-full bg-white flex items-center justify-center shadow-lg mb-3 text-[#07365A]">
           <Sparkles className="w-8 h-8" />
         </div>
       )}
-      <h3 className="text-white font-serif font-black text-base tracking-wide">Amulya Hospital</h3>
+      <h3 className="text-white font-serif font-black text-base tracking-wide">{settings?.hospitalName || "Amulya Nursing Home"}</h3>
       <p className="text-white/60 text-[9px] uppercase font-extrabold tracking-widest mt-0.5">Spine, Joint & Trauma Care</p>
     </div>
   );
@@ -244,7 +244,7 @@ export function HeroSlider() {
               variants={textItemVariants}
               className="max-w-[480px] text-[17px] font-normal leading-[1.7] text-[#4B5563] dark:text-slate-300"
             >
-              Amulya Hospital has provided dedicated orthopedic surgeries, trauma triage, and deformity corrections in Narasaraopet for over three decades.
+              {settings?.hospitalName || "Amulya Nursing Home"} has provided dedicated orthopedic surgeries, trauma triage, and deformity corrections in Narasaraopet for over three decades.
             </motion.p>
 
             {/* CTA Buttons stack */}
@@ -331,7 +331,7 @@ export function HeroSlider() {
                 {activeImageUrl ? (
                   <img
                     src={activeImageUrl}
-                    alt="Amulya Hospital Facility Slider"
+                    alt={`${settings?.hospitalName || "Amulya Nursing Home"} Facility Slider`}
                     className="h-full w-full object-cover"
                   />
                 ) : (

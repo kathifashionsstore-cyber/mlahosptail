@@ -8,7 +8,7 @@ import DetailTemplate from "../components/DetailTemplate";
 
 export function ServiceDetail() {
   const { slug } = useParams();
-  const { services, getImageUrl } = useApp();
+  const { services, getImageUrl, settings } = useApp();
   const [service, setService] = useState(null);
   const [loading, setLoading] = useState(true);
 
@@ -65,7 +65,7 @@ export function ServiceDetail() {
   return (
     <>
       <Helmet>
-        <title>{service.seoTitle || service.metaTitle || `${service.name} Treatment | Amulya Hospital`}</title>
+        <title>{service.seoTitle || service.metaTitle || `${service.name} Treatment | ${settings?.hospitalName || "Amulya Nursing Home"}`}</title>
         <meta name="description" content={service.seoDescription || service.metaDescription || service.shortDescription || service.description} />
         {service.seoKeywords && <meta name="keywords" content={service.seoKeywords} />}
         

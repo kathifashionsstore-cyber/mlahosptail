@@ -50,7 +50,7 @@ function parseMessageText(text, closePanel) {
   return parts.length > 0 ? parts : text;
 }
 
-function findIntent(input, services, doctors) {
+function findIntent(input, services, doctors, hospitalName) {
   const query = input.toLowerCase().trim();
 
   // 1. Check Emergency / Ambulance
@@ -70,7 +70,7 @@ function findIntent(input, services, doctors) {
   if (query.match(/\b(location|address|directions|map|where|reach|find)\b/)) {
     return {
       type: "faq",
-      text: "📍 **Amulya Hospital Location:**\nGuntur Road, Narasaraopet, Andhra Pradesh - 522601.\n\n**Hours:** OPD is open 10:00 AM – 7:00 PM (Mon-Sat). Casualty/ER is open 24/7.",
+      text: `📍 **${hospitalName} Location:**\nGuntur Road, Narasaraopet, Andhra Pradesh - 522601.\n\n**Hours:** OPD is open 10:00 AM – 7:00 PM (Mon-Sat). Casualty/ER is open 24/7.`,
       buttons: [
         { label: "Get Directions on Google Maps", type: "link_external", value: "https://www.google.com/maps?daddr=Amulya+Nursing+Home,+Narasaraopet" },
         { label: "OPD Schedule", type: "quick_reply", value: "Hospital Location & Hours" }
@@ -83,7 +83,7 @@ function findIntent(input, services, doctors) {
   if (query.match(/\b(aarogyasri|arogyasri|insurance|cashless|tpa|ehs|wjhs|free|card)\b/)) {
     return {
       type: "faq",
-      text: "💳 **Cashless & Schemes:**\nAmulya Hospital accepts **Dr. YSR Aarogyasri**, Employee Health Scheme (EHS), WJHS, and major private insurance TPAs.\n\nYou can view more details on our [Insurance Info](/patient-care/insurance) page.",
+      text: `💳 **Cashless & Schemes:**\n${hospitalName} accepts **Dr. YSR Aarogyasri**, Employee Health Scheme (EHS), WJHS, and major private insurance TPAs.\n\nYou can view more details on our [Insurance Info](/patient-care/insurance) page.`,
       buttons: [
         { label: "View Insurance Page", type: "link_internal", value: "/patient-care/insurance" },
         { label: "Book Consultation", type: "link_internal", value: "/book-appointment" }
@@ -202,7 +202,7 @@ export function Chatbot() {
       {
         id: "welcome",
         sender: "bot",
-        text: "👋 Hello! Welcome to **Amulya Hospital Assistant**.\n\nHow can I help you find services, specialists, or hospital information today?",
+        text: `👋 Hello! Welcome to **${settings?.hospitalName || "Amulya Nursing Home"} Assistant**.\n\nHow can I help you find services, specialists, or hospital information today?`,
         isGreeting: true,
       }
     ];
@@ -272,7 +272,7 @@ export function Chatbot() {
       const query = text.toLowerCase().trim();
 
       if (query === "find a treatment/service") {
-        botReplyText = "🦴 **Our Services & Specialities:**\nAmulya Hospital provides advanced diagnostics, surgeries, and correction therapies under one roof. Please type a condition (e.g. knee pain, disc slip, trauma) or review our major departments:";
+        botReplyText = `🦴 **Our Services & Specialities:**\n${settings?.hospitalName || "Amulya Nursing Home"} provides advanced diagnostics, surgeries, and correction therapies under one roof. Please type a condition (e.g. knee pain, disc slip, trauma) or review our major departments:`;
         items = services.slice(0, 3);
         botReplyType = "services";
         suggested = ["Meet Our Doctors", "Book Appointment", "FAQs"];
@@ -289,7 +289,7 @@ export function Chatbot() {
         ];
         suggested = ["Meet Our Doctors", "Hospital Location & Hours"];
       } else if (query === "hospital location & hours") {
-        botReplyText = "📍 **Location & Schedule:**\nAmulya Hospital is situated on **Guntur Road, Narasaraopet, Palnadu District, AP - 522601**.\n\n- **Casualty & Trauma ICU:** Open 24/7\n- **General OPD Timings:** 10:00 AM – 7:00 PM, Mon-Sat";
+        botReplyText = `📍 **Location & Schedule:**\n${settings?.hospitalName || "Amulya Nursing Home"} is situated on **Guntur Road, Narasaraopet, Palnadu District, AP - 522601**.\n\n- **Casualty & Trauma ICU:** Open 24/7\n- **General OPD Timings:** 10:00 AM – 7:00 PM, Mon-Sat`;
         buttons = [
           { label: "Get Directions on Google Maps", type: "link_external", value: "https://www.google.com/maps?daddr=Amulya+Nursing+Home,+Narasaraopet" }
         ];
@@ -317,7 +317,7 @@ export function Chatbot() {
         botReplyText = "💰 **Consultation Fees:**\nOPD registration fees are nominal. Please verify with the front admissions desk on arrival.";
         suggested = ["Book Appointment", "Hospital Location & Hours"];
       } else {
-        const matchResult = findIntent(text, services, doctors);
+        const matchResult = findIntent(text, services, doctors, settings?.hospitalName || "Amulya Nursing Home");
         if (matchResult) {
           botReplyText = matchResult.text;
           botReplyType = matchResult.type;

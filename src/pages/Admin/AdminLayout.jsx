@@ -294,7 +294,7 @@ export function AdminLayout() {
         <div className={`flex items-center border-b border-slate-100 pb-4 dark:border-slate-800 ${compact ? "justify-center" : "justify-between"}`}>
           <Link to="/admin" className={`flex items-center gap-3 ${compact ? "justify-center" : ""}`}>
             {settings?.logoUrl ? (
-              <img src={settings.logoUrl} alt="Amulya Hospital" className="h-9 w-9 rounded-xl bg-white object-contain p-0.5 shadow-sm" />
+              <img src={settings.logoUrl} alt={settings?.hospitalName || "Amulya Nursing Home"} className="h-9 w-9 rounded-xl bg-white object-contain p-0.5 shadow-sm" />
             ) : (
               <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-[#1E7FC2] text-white">
                 <LayoutDashboard className="h-5 w-5" />

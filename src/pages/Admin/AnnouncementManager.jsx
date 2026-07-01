@@ -51,7 +51,7 @@ export function AnnouncementManager() {
         // Seed default items if empty
         const defaults = [
           { text: "🌐 Website made by WayzenTech | 📞 9398724704", linkUrl: "", linkLabel: "", isActive: true, order: 1 },
-          { text: "🏥 Amulya Hospital — Spine, Joint & Trauma Care | Guntur Road, Narasaraopet", linkUrl: "/about", linkLabel: "About Us", isActive: true, order: 2 },
+          { text: "🏥 Amulya Nursing Home — Spine, Joint & Trauma Care | Guntur Road, Narasaraopet", linkUrl: "/about", linkLabel: "About Us", isActive: true, order: 2 },
           { text: "📞 OPD Appointments: +91 8647223625 | Mon–Sat 9AM–6PM", linkUrl: "/book-appointment", linkLabel: "Book Now", isActive: true, order: 3 },
           { text: "🚑 24/7 Emergency & Trauma Care Available", linkUrl: "/contact", linkLabel: "Emergency contact", isActive: true, order: 4 }
         ];
