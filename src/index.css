@@ -9,18 +9,29 @@
   /* Dynamic Custom Theming System (controlled from Admin) */
   --color-primary: #1E7FC2;
   --color-primary-dark: #061F33;
+  --color-primary-light: #E7F3FA;
   --color-accent: #2FA84F;
   --color-bg: #FFFFFF;
+  --color-surface: #FFFFFF;
   --color-text: #152431;
+  --color-text-muted: #64748B;
+  --color-heading: #07365A;
+  --color-border: #E2E8F0;
   --color-nav-bg: #07365A;
+  --color-nav-text: #FFFFFF;
   --color-card-bg: #FFFFFF;
   --color-button: #D81F26;
   --color-button-hover: #b3151b;
-  --color-heading: #07365A;
-  --color-border: #E2E8F0;
+
+  /* Typography variables */
+  --font-heading: 'Poppins', sans-serif;
+  --font-body: 'Inter', sans-serif;
+  --font-size-base: 16px;
+  --font-heading-weight: 700;
+  --announcement-bar-height: 40px;
+  --navbar-height: 70px;
 
   /* Additional helper scales derived or mapped */
-  --color-primary-light: #E7F3FA;
   --color-accent-light: #DFF8EA;
 
   /* Legacy variables mapped to new dynamic properties for backwards compatibility */
@@ -57,9 +68,12 @@
   --ink: var(--color-text);
 }
 
+html, body {
+  font-family: var(--font-body) !important;
+  font-size: var(--font-size-base) !important;
+}
+
 body {
-  font-family: "Inter", sans-serif;
-  font-size: 16px;
   line-height: 1.7;
   overflow-x: hidden;
   scroll-behavior: smooth;
@@ -67,7 +81,64 @@ body {
 }
 
 h1, h2, h3, h4, h5, h6 {
-  font-family: "Poppins", sans-serif;
+  font-family: var(--font-heading) !important;
+  font-weight: var(--font-heading-weight) !important;
+}
+
+p {
+  font-size: var(--font-size-base);
+  color: #374151;
+  line-height: 1.7;
+}
+
+.section-label {
+  display: inline-block;
+  margin-bottom: 12px;
+  color: var(--color-primary);
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 2.5px;
+  line-height: 1.2;
+  text-transform: uppercase;
+}
+
+.section-heading {
+  margin-bottom: 16px;
+  color: var(--color-heading, #0D2137);
+  font-size: clamp(28px, 4vw, 42px);
+  font-weight: 800 !important;
+  letter-spacing: 0;
+  line-height: 1.15;
+}
+
+.section-subheading {
+  max-width: 640px;
+  color: #4B5563;
+  font-size: 17px;
+  font-weight: 400;
+  line-height: 1.65;
+}
+
+.section-subheading.centered {
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.card-title {
+  color: var(--color-heading, #0D2137);
+  font-size: 20px;
+  font-weight: 700;
+  line-height: 1.25;
+}
+
+.card-body {
+  color: #6B7280;
+  font-size: 15px;
+  line-height: 1.6;
+}
+
+.font-serif {
+  font-family: var(--font-heading) !important;
 }
 
 /* Tabular figures for stats */
@@ -451,35 +522,129 @@ h1, h2, h3, h4, h5, h6 {
 .border-\[\#D81F26\]\/30 { border-color: color-mix(in srgb, var(--color-button) 30%, transparent) !important; }
 .border-t-\[\#D81F26\] { border-top-color: var(--color-button) !important; }
 
-/* Announcement Bar Layout Shifts */
-html.has-announcement .fixed-nav-offset {
-  top: 36px !important;
+/* Fixed public chrome layout */
+.navbar-fixed {
+  position: fixed;
+  top: var(--announcement-bar-height);
+  z-index: 1000;
+  width: 100%;
+  transition: top 200ms ease;
 }
-html.has-announcement .public-mobile-drawer {
-  top: 116px !important;
+
+.page-wrapper {
+  padding-top: calc(var(--announcement-bar-height) + var(--navbar-height));
+  transition: padding-top 200ms ease;
+  scroll-margin-top: calc(var(--announcement-bar-height) + var(--navbar-height));
 }
-@media (min-width: 768px) {
-  html.has-announcement .fixed-nav-offset {
-    top: 40px !important;
+
+.public-mobile-drawer {
+  top: calc(var(--announcement-bar-height) + var(--navbar-height));
+}
+
+.page-wrapper > .pt-24:first-child,
+.page-wrapper > .pt-32:first-child {
+  padding-top: 0 !important;
+}
+
+@media (max-width: 768px) {
+  :root {
+    --navbar-height: 60px;
   }
-  html.has-announcement .public-mobile-drawer {
-    top: 120px !important;
+}
+
+/* Floating public action buttons */
+.floating-action-button,
+.floating-widget-stack > button {
+  position: relative;
+  display: flex;
+  width: 48px;
+  height: 48px;
+  align-items: center;
+  justify-content: center;
+  border-radius: 9999px;
+  color: #ffffff;
+  box-shadow: 0 10px 24px rgba(15, 23, 42, 0.18);
+  transition: transform 150ms ease, box-shadow 150ms ease, background-color 150ms ease;
+}
+
+.floating-action-button:hover,
+.floating-widget-stack > button:hover {
+  transform: scale(1.1);
+  box-shadow: 0 16px 34px rgba(15, 23, 42, 0.26);
+}
+
+.floating-action-button:focus-visible,
+.floating-widget-stack > button:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 3px;
+}
+
+.floating-action-icon {
+  width: 22px;
+  height: 22px;
+}
+
+.floating-tooltip {
+  position: absolute;
+  right: 56px;
+  top: 50%;
+  z-index: 1;
+  transform: translateY(-50%) translateX(4px);
+  border-radius: 6px;
+  background: #1F2937;
+  color: #ffffff;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1;
+  opacity: 0;
+  padding: 7px 10px;
+  pointer-events: none;
+  white-space: nowrap;
+  transition: opacity 150ms ease, transform 150ms ease;
+}
+
+.floating-tooltip::after {
+  content: "";
+  position: absolute;
+  right: -5px;
+  top: 50%;
+  width: 10px;
+  height: 10px;
+  background: #1F2937;
+  transform: translateY(-50%) rotate(45deg);
+}
+
+.floating-action-button:hover .floating-tooltip,
+.floating-action-button:focus-visible .floating-tooltip {
+  opacity: 1;
+  transform: translateY(-50%) translateX(0);
+}
+
+@media (max-width: 480px) {
+  .floating-widget-stack {
+    right: 16px;
+    bottom: 20px;
   }
-}
-html.has-announcement .pt-24 {
-  padding-top: calc(6rem + 36px) !important;
-}
-@media (min-width: 768px) {
-  html.has-announcement .pt-24 {
-    padding-top: calc(6rem + 40px) !important;
+
+  .floating-action-button,
+  .floating-widget-stack > button {
+    width: 40px;
+    height: 40px;
   }
-}
-html.has-announcement .pt-32 {
-  padding-top: calc(8rem + 36px) !important;
-}
-@media (min-width: 768px) {
-  html.has-announcement .pt-32 {
-    padding-top: calc(8rem + 40px) !important;
+
+  .floating-action-icon {
+    width: 18px;
+    height: 18px;
+  }
+
+  .floating-action-button svg,
+  .floating-widget-stack > button svg {
+    max-width: 18px;
+    max-height: 18px;
+  }
+
+  .floating-tooltip {
+    display: none;
   }
 }
 

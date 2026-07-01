@@ -1,10 +1,11 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
-import { UserRound, Check, Calendar, Clock, Languages } from "lucide-react";
+import { UserRound, Check } from "lucide-react";
 import { useApp } from "../context/AppContext";
+import { getDoctorPhoto } from "../hooks/useDoctorPhoto";
 
 export function Doctors() {
-  const { doctors, departments, getImageUrl } = useApp();
+  const { doctors, departments, siteImages } = useApp();
   const [selectedDept, setSelectedDept] = useState("all");
 
   const filteredDoctors =
@@ -15,11 +16,13 @@ export function Doctors() {
   return (
     <div className="pt-24 min-h-screen bg-white dark:bg-slate-950 transition-colors duration-300">
       {/* 1. Header Banner */}
-      <section className="premium-banner text-white py-16 px-6 md:px-12 relative overflow-hidden">
-        <div className="max-w-7xl mx-auto space-y-3 relative z-10">
-          <span className="text-xs uppercase font-extrabold tracking-widest text-[#D81F26]">Our Specialists</span>
-          <h1 className="text-3xl md:text-5xl font-extrabold font-serif tracking-tight">Meet Our Medical Team</h1>
-          <p className="text-sm md:text-base text-slate-200 max-w-2xl font-medium">
+      <section className="bg-white px-6 py-16 dark:bg-slate-950 md:px-12">
+        <div className="max-w-7xl mx-auto text-center space-y-0">
+          <span className="section-label">Our Specialists</span>
+          <h1 className="mb-4 text-[clamp(32px,5vw,48px)] font-extrabold leading-[1.15] tracking-normal text-[#0D2137] dark:text-white">
+            Meet Our Medical Team
+          </h1>
+          <p className="section-subheading centered">
             Experienced orthopaedic surgeons, spine specialists, and medical officers serving Palnadu.
           </p>
         </div>
@@ -32,10 +35,10 @@ export function Doctors() {
             {/* 'All' Chip */}
             <button
               onClick={() => setSelectedDept("all")}
-              className={`px-5 py-2 rounded-full text-xs font-bold transition-all duration-200 border-2 ${
+              className={`rounded-[24px] px-[18px] py-2 text-[14px] font-semibold transition-all duration-200 border ${
                 selectedDept === "all"
-                  ? "bg-[#1E7FC2] border-[#1E7FC2] text-white shadow-md"
-                  : "border-transparent text-[#1E7FC2] bg-[#E7F3FA] hover:bg-[#1E7FC2] hover:text-white"
+                  ? "bg-[#1E7FC2] border-[#1E7FC2] text-white shadow-md font-semibold"
+                  : "bg-[#EFF6FF] text-[#1E40AF] border-[#BFDBFE] hover:bg-[#1E7FC2] hover:text-white"
               }`}
             >
               All Specialists
@@ -46,10 +49,10 @@ export function Doctors() {
               <button
                 key={dept.id}
                 onClick={() => setSelectedDept(dept.id)}
-                className={`px-5 py-2 rounded-full text-xs font-bold transition-all duration-200 border-2 ${
+                className={`rounded-[24px] px-[18px] py-2 text-[14px] font-semibold transition-all duration-200 border ${
                   selectedDept === dept.id
-                    ? "bg-[#1E7FC2] border-[#1E7FC2] text-white shadow-md"
-                    : "border-transparent text-[#1E7FC2] bg-[#E7F3FA] hover:bg-[#1E7FC2] hover:text-white"
+                    ? "bg-[#1E7FC2] border-[#1E7FC2] text-white shadow-md font-semibold"
+                    : "bg-[#EFF6FF] text-[#1E40AF] border-[#BFDBFE] hover:bg-[#1E7FC2] hover:text-white"
                 }`}
               >
                 {dept.name}
@@ -72,7 +75,7 @@ export function Doctors() {
                   {/* Photo or Circular gradient avatar placeholder */}
                   <div className="w-28 h-28 rounded-full bg-gradient-to-br from-[#1E7FC2] to-[#0B3C5D] flex items-center justify-center flex-shrink-0 text-white shadow-md overflow-hidden relative">
                     <img
-                      src={getImageUrl(`doctor-photo-${docItem.slug || docItem.id}`, docItem.photoUrl || "https://images.unsplash.com/photo-1622253692010-333f2da6031d?auto=format&fit=crop&w=400&q=80")}
+                      src={getDoctorPhoto(docItem, null, siteImages)}
                       alt={docItem.name}
                       className="w-full h-full object-cover"
                     />
@@ -81,20 +84,20 @@ export function Doctors() {
                   {/* Body Content */}
                   <div className="flex-grow space-y-3 text-center md:text-left w-full">
                     <div>
-                      <span className="text-[10px] uppercase tracking-wider font-extrabold text-[#1E7FC2] block">
+                      <span className="block text-[12px] font-bold uppercase tracking-[1.5px] text-[#1E7FC2]">
                         {docItem.designation}
                       </span>
-                      <h2 className="text-xl font-bold text-[#0B3C5D] dark:text-white font-serif leading-tight mt-0.5">
+                      <h2 className="mt-1 text-[20px] font-bold leading-tight text-[#0D2137] dark:text-white">
                         {docItem.name}
                       </h2>
-                      <p className="text-xs font-bold text-slate-400 dark:text-slate-500 mt-0.5">
+                      <p className="mt-1 text-[14px] font-normal text-[#6B7280] dark:text-slate-400">
                         {docItem.qualification}
                       </p>
                     </div>
 
                     {/* Checklist spec info */}
-                    <ul className="space-y-1 text-xs text-[#5C6E7A] dark:text-slate-400 font-semibold flex flex-col items-center md:items-start">
-                      {docItem.specialization.map((spec, i) => (
+                    <ul className="space-y-1 text-[14px] leading-[1.7] text-[#374151] dark:text-slate-300 font-normal flex flex-col items-center md:items-start">
+                      {(Array.isArray(docItem.specialization) ? docItem.specialization : []).map((spec, i) => (
                         <li key={i} className="flex items-center space-x-1.5">
                           <Check className="w-3.5 h-3.5 text-[#D81F26] flex-shrink-0" />
                           <span>{spec}</span>

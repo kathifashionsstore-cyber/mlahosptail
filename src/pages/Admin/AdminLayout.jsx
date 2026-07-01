@@ -49,7 +49,7 @@ const NAV_SECTIONS = [
     label: "Appointments & Patients",
     items: [
       { to: "/admin/appointments", label: "Appointments", icon: CalendarCheck },
-      { to: "/admin/enquiries", label: "Helpline Enquiries", icon: ClipboardList },
+      { to: "/admin/enquiries", label: "Helpline Enquiries", icon: MessageSquare },
     ],
   },
   {
@@ -113,6 +113,7 @@ export function AdminLayout() {
   const [avatarOpen, setAvatarOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [notificationCount, setNotificationCount] = useState(0);
+  const [pendingEnquiriesCount, setPendingEnquiriesCount] = useState(0);
 
   const navigate = useNavigate();
   const location = useLocation();
@@ -182,6 +183,19 @@ export function AdminLayout() {
     };
 
     loadNotifications();
+
+    const q = query(collection(db, "enquiries"), where("status", "==", "pending"));
+    const unsubscribe = onSnapshot(
+      q,
+      (snapshot) => {
+        setPendingEnquiriesCount(snapshot.size);
+      },
+      (err) => {
+        console.warn("Failed to subscribe to pending enquiries in layout:", err);
+      }
+    );
+
+    return () => unsubscribe();
   }, []);
 
   const handleLogout = async () => {
@@ -249,6 +263,27 @@ export function AdminLayout() {
       >
         <Icon className="h-4.5 w-4.5 flex-shrink-0" />
         {!compact && <span className="truncate">{item.label}</span>}
+        
+        {/* Pulsing green dot on Dashboard item */}
+        {item.label === "Dashboard" && pendingEnquiriesCount > 0 && (
+          <span className="absolute top-1 right-1 flex h-2 w-2">
+            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-450 opacity-75"></span>
+            <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+          </span>
+        )}
+
+        {/* Red badge notification count on Helpline Enquiries */}
+        {item.label === "Helpline Enquiries" && pendingEnquiriesCount > 0 && (
+          compact ? (
+            <span className="absolute top-1 right-1 flex h-4.5 w-4.5 items-center justify-center text-[9px] font-black text-white bg-[#D81F26] rounded-full">
+              {pendingEnquiriesCount}
+            </span>
+          ) : (
+            <span className="ml-auto inline-flex items-center justify-center h-5 px-2 text-[10px] font-black text-white bg-[#D81F26] rounded-full">
+              {pendingEnquiriesCount}
+            </span>
+          )
+        )}
       </NavLink>
     );
   };

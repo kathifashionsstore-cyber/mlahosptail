@@ -62,6 +62,8 @@ export function AppProvider({ children }) {
 
   // Search index for global search
   const [searchIndex, setSearchIndex] = useState([]);
+  const [enquiries, setEnquiries] = useState([]);
+  const [pendingEnquiriesCount, setPendingEnquiriesCount] = useState(0);
 
   useEffect(() => {
     const unsubscribe = onSnapshot(
@@ -83,16 +85,16 @@ export function AppProvider({ children }) {
 
   useEffect(() => {
     const fallbackBanner = getFallbackCollection("welcomeBanner").find(isPublicDocumentLive) || null;
-    const q = query(collection(db, "welcomeBanner"), where("isActive", "==", true), orderBy("order", "asc"));
 
     const unsubscribe = onSnapshot(
-      q,
+      collection(db, "welcomeBanner"),
       (snapshot) => {
         const banners = snapshot.empty
           ? fallbackBanner ? [fallbackBanner] : []
           : snapshot.docs.map((docSnap) => ({ id: docSnap.id, ...docSnap.data() }));
 
-        setWelcomeBanner(sortByOrder(banners).find(isPublicDocumentLive) || null);
+        const activeBanners = banners.filter(isPublicDocumentLive);
+        setWelcomeBanner(sortByOrder(activeBanners)[0] || null);
       },
       (err) => {
         console.error("Failed to subscribe to welcome banner:", err);
@@ -104,12 +106,14 @@ export function AppProvider({ children }) {
   }, []);
 
   useEffect(() => {
-    const q = query(collection(db, "announcements"), where("isActive", "==", true), orderBy("order", "asc"));
     const unsubscribe = onSnapshot(
-      q,
+      collection(db, "announcements"),
       (snapshot) => {
         const list = snapshot.docs.map((docSnap) => ({ id: docSnap.id, ...docSnap.data() }));
-        setAnnouncements(list);
+        const activeSorted = list
+          .filter(a => a.isActive !== false)
+          .sort((a, b) => Number(a.order || 0) - Number(b.order || 0));
+        setAnnouncements(activeSorted);
       },
       (err) => {
         console.error("Failed to subscribe to announcements:", err);
@@ -124,6 +128,8 @@ export function AppProvider({ children }) {
       (snapshot) => {
         if (snapshot.exists()) {
           setAnnouncementSettings(snapshot.data());
+        } else {
+          setAnnouncementSettings({ showAnnouncementBar: true });
         }
       },
       (err) => {
@@ -134,17 +140,88 @@ export function AppProvider({ children }) {
   }, []);
 
   useEffect(() => {
-    const q = query(collection(db, "festivalBanners"), where("isActive", "==", true), orderBy("order", "asc"));
     const unsubscribe = onSnapshot(
-      q,
+      collection(db, "festivalBanners"),
       (snapshot) => {
         const list = snapshot.docs.map((docSnap) => ({ id: docSnap.id, ...docSnap.data() }));
-        setFestivalBanners(list);
+        const activeSorted = list
+          .filter(b => b.isActive !== false)
+          .sort((a, b) => Number(a.order || 0) - Number(b.order || 0));
+        setFestivalBanners(activeSorted);
       },
       (err) => {
         console.error("Failed to subscribe to festival banners:", err);
       }
     );
+    return () => unsubscribe();
+  }, []);
+
+  // Real-time enquiries subscription
+  useEffect(() => {
+    const unsubscribe = onSnapshot(
+      collection(db, "enquiries"),
+      (snapshot) => {
+        const list = snapshot.docs.map((docSnap) => ({ id: docSnap.id, ...docSnap.data() }));
+        setEnquiries(list);
+        const pendingCount = list.filter((e) => e.status === "pending" || e.status === "unread" || !e.status).length;
+        setPendingEnquiriesCount(pendingCount);
+      },
+      (err) => {
+        console.error("Failed to subscribe to enquiries in AppContext:", err);
+      }
+    );
+    return () => unsubscribe();
+  }, []);
+
+  // Real-time typography settings - Google Fonts dynamic injection
+  useEffect(() => {
+    function injectGoogleFonts(headingFont, bodyFont) {
+      const fonts = [headingFont, bodyFont].filter(Boolean);
+      if (fonts.length === 0) return;
+      
+      const fontId = "dynamic-google-fonts";
+      let link = document.getElementById(fontId);
+      if (!link) {
+        link = document.createElement("link");
+        link.id = fontId;
+        link.rel = "stylesheet";
+        document.head.appendChild(link);
+      }
+      
+      const formattedNames = fonts.map(f => f.replace(/\s+/g, "+")).join("&family=");
+      link.href = `https://fonts.googleapis.com/css2?family=${formattedNames}:wght@300;400;500;600;700;800;900&display=swap`;
+    }
+
+    const unsubscribe = onSnapshot(
+      doc(db, "siteSettings", "typography"),
+      (snapshot) => {
+        const root = document.documentElement;
+        if (snapshot.exists()) {
+          const data = snapshot.data();
+          const headingFont = data.headingFont || "Poppins";
+          const bodyFont = data.bodyFont || "Inter";
+          const fontSize = data.fontSize || 16;
+          const headingWeight = data.headingWeight || "700";
+
+          root.style.setProperty("--font-heading", `'${headingFont}', sans-serif`);
+          root.style.setProperty("--font-body", `'${bodyFont}', sans-serif`);
+          root.style.setProperty("--font-size-base", `${fontSize}px`);
+          root.style.setProperty("--font-heading-weight", `${headingWeight}`);
+
+          injectGoogleFonts(headingFont, bodyFont);
+        } else {
+          root.style.setProperty("--font-heading", "'Poppins', sans-serif");
+          root.style.setProperty("--font-body", "'Inter', sans-serif");
+          root.style.setProperty("--font-size-base", "16px");
+          root.style.setProperty("--font-heading-weight", "700");
+          injectGoogleFonts("Poppins", "Inter");
+        }
+      },
+      (err) => {
+        console.error("Failed to subscribe to typography settings:", err);
+      }
+    );
+
     return () => unsubscribe();
   }, []);
 
@@ -160,16 +237,16 @@ export function AppProvider({ children }) {
 
     const unsubscribers = configs.map(({ collectionName, setter }) => {
       const fallbackList = getFallbackCollection(collectionName).filter(isPublicDocumentLive);
-      const q = query(collection(db, collectionName), where("isActive", "==", true), orderBy("order", "asc"));
 
       return onSnapshot(
-        q,
+        collection(db, collectionName),
         (snapshot) => {
           const list = snapshot.empty
             ? fallbackList
             : snapshot.docs.map((docSnap) => ({ id: docSnap.id, ...docSnap.data() }));
 
-          setter(sortByOrder(list.filter(isPublicDocumentLive)));
+          const processed = list.filter(isPublicDocumentLive);
+          setter(sortByOrder(processed));
         },
         (err) => {
           console.error(`Failed to subscribe to ${collectionName}:`, err);
@@ -499,6 +576,8 @@ export function AppProvider({ children }) {
         announcements,
         announcementSettings,
         festivalBanners,
+        enquiries,
+        pendingEnquiriesCount,
       }}
     >
       {children}

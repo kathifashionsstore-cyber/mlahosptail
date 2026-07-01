@@ -197,7 +197,7 @@ function AppContent() {
         <Navbar />
 
         {/* Public Pages Viewport */}
-        <main className="flex-grow pb-16 md:pb-0">
+        <main className="page-wrapper flex-grow pb-16 md:pb-0">
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/about" element={<About />} />

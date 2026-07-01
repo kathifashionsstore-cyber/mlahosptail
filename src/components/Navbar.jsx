@@ -49,7 +49,7 @@ export function Navbar() {
 
   // Nav link style generator
   const getNavLinkClass = (isActive) =>
-    `relative text-xs font-bold uppercase tracking-wider py-1.5 transition-colors duration-200 ${
+    `relative text-[15px] ${isActive ? "font-semibold" : "font-medium"} py-1.5 transition-colors duration-200 ${
       isScrolled
         ? isActive
           ? "text-[#D81F26]"
@@ -62,7 +62,7 @@ export function Navbar() {
   // Menu button style generator
   const getMenuBtnClass = (menuName) => {
     const isActive = activeDropdown === menuName;
-    return `flex items-center space-x-1 text-xs font-bold uppercase tracking-wider py-1.5 transition-colors duration-200 ${
+    return `flex items-center space-x-1 text-[15px] ${isActive ? "font-semibold" : "font-medium"} py-1.5 transition-colors duration-200 ${
       isScrolled
         ? isActive
           ? "text-[#D81F26]"
@@ -75,25 +75,25 @@ export function Navbar() {
 
   return (
     <>
-      <header className="fixed top-0 left-0 right-0 z-50 transition-all duration-300 fixed-nav-offset" ref={dropdownRef}>
+      <header className="navbar-fixed left-0 right-0 transition-all duration-300" ref={dropdownRef}>
         {/* Main Header Row */}
         <nav
           className={`transition-all duration-300 border-b relative z-50 ${
             isScrolled
-              ? "bg-[#0B3C5D] shadow-md py-3 text-white border-transparent"
+              ? "bg-[#0B3C5D] shadow-md py-2 text-white border-transparent"
               : isHomePage
-              ? "bg-white/95 dark:bg-slate-900/95 md:bg-transparent md:dark:bg-transparent border-transparent py-4 md:py-6"
-              : "bg-white dark:bg-slate-900 border-slate-100 dark:border-slate-850 py-4"
+              ? "bg-white/95 dark:bg-slate-900/95 md:bg-transparent md:dark:bg-transparent border-transparent py-2 md:py-[9px]"
+              : "bg-white dark:bg-slate-900 border-slate-100 dark:border-slate-850 py-2 md:py-[9px]"
           }`}
         >
           <div className="max-w-7xl mx-auto px-6 md:px-8 flex items-center justify-between">
             {/* Logo lockup */}
             <Link to="/" className="flex items-center space-x-3 group">
-              <div className="w-12 h-12 rounded-xl bg-white flex items-center justify-center shadow-sm p-1">
+              <div className="w-11 h-11 md:w-[52px] md:h-[52px] rounded-xl bg-white flex items-center justify-center shadow-sm">
                 <img
                   src={settings?.logoUrl || "https://images.unsplash.com/photo-1584515933487-779824d29309?auto=format&fit=crop&w=150&q=80"}
                   alt="Hospital Logo"
-                  className="w-full h-full object-contain"
+                  className="block h-full w-auto max-w-full object-contain"
                 />
               </div>
               <div className="text-left">
@@ -435,7 +435,7 @@ export function Navbar() {
               animate={{ x: 0 }}
               exit={{ x: "100%" }}
               transition={{ type: "tween", duration: 0.25 }}
-              className="public-mobile-drawer fixed inset-0 top-[80px] bg-white dark:bg-slate-900 z-40 overflow-y-auto px-6 py-6 flex flex-col justify-between"
+              className="public-mobile-drawer fixed left-0 right-0 bottom-0 bg-white dark:bg-slate-900 z-40 overflow-y-auto px-6 py-6 flex flex-col justify-between"
             >
               <div className="space-y-6">
                 {/* Main Navigation Links */}

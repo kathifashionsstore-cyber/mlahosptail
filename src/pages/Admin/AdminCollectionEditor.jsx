@@ -4,6 +4,7 @@ import {
   deleteDoc,
   doc,
   getDocs,
+  onSnapshot,
   orderBy,
   query,
   setDoc,
@@ -18,6 +19,7 @@ import {
   Check,
   Copy,
   Eye,
+  FileText,
   FileEdit,
   Image as ImageIcon,
   Plus,
@@ -104,6 +106,7 @@ export function AdminCollectionEditor({
   const [sortConfig, setSortConfig] = useState({ key: "order", direction: "asc" });
   const [currentPage, setCurrentPage] = useState(1);
   const [initialFormData, setInitialFormData] = useState({});
+  const [notice, setNotice] = useState(null);
 
   const orderedFields = useMemo(() => fields, [fields]);
 
@@ -166,8 +169,31 @@ export function AdminCollectionEditor({
   };
 
   useEffect(() => {
-    fetchItems();
-  }, [collectionName]);
+    setLoading(true);
+    const unsubscribe = onSnapshot(
+      collection(db, collectionName),
+      (snapshot) => {
+        const docs = snapshot.docs.map((docSnap) => ({ id: docSnap.id, ...docSnap.data() }));
+        docs.sort((a, b) => Number(a[sortField] || 0) - Number(b[sortField] || 0));
+        setItems(docs);
+        setSelectedIds([]);
+        setLoading(false);
+      },
+      (error) => {
+        console.error(`Failed to subscribe to ${collectionName}:`, error);
+        setNotice({ type: "error", text: error.message || `Failed to load ${title}.` });
+        setLoading(false);
+      }
+    );
+
+    return () => unsubscribe();
+  }, [collectionName, sortField, title]);
+
+  useEffect(() => {
+    if (!notice) return undefined;
+    const timer = setTimeout(() => setNotice(null), 3000);
+    return () => clearTimeout(timer);
+  }, [notice]);
 
   const openAddModal = () => {
     const defaults = {};
@@ -274,11 +300,16 @@ export function AdminCollectionEditor({
       }
 
       setIsModalOpen(false);
-      await fetchItems();
       await loadCollections();
+      setNotice({
+        type: "success",
+        text: collectionName === "doctors"
+          ? `Doctor ${editingItem ? "updated" : "created"} successfully`
+          : `${title} saved successfully.`,
+      });
     } catch (error) {
       console.error(`Failed to save ${collectionName}:`, error);
-      alert(error.message || "Failed to save item.");
+      setNotice({ type: "error", text: error.message || "Failed to save. Please try again." });
     } finally {
       setSaving(false);
     }
@@ -289,7 +320,6 @@ export function AdminCollectionEditor({
     setSaving(true);
     try {
       await deleteDoc(doc(db, collectionName, item.id));
-      await fetchItems();
       await loadCollections();
     } catch (error) {
       console.error(`Failed to delete ${collectionName}:`, error);
@@ -313,7 +343,6 @@ export function AdminCollectionEditor({
       const requestedId = clone[idField] || clone.slug || clone.name || clone.title || clone.heading || `${collectionName}-${Date.now()}`;
       const documentId = `${slugify(requestedId)}-${Date.now()}`;
       await setDoc(doc(db, collectionName, documentId), { id: documentId, ...clone });
-      await fetchItems();
       await loadCollections();
     } catch (error) {
       console.error(`Failed to duplicate ${collectionName}:`, error);
@@ -366,7 +395,6 @@ export function AdminCollectionEditor({
     setSaving(true);
     try {
       await Promise.all(selectedIds.map((itemId) => updateDoc(doc(db, collectionName, itemId), patch)));
-      await fetchItems();
       await loadCollections();
     } catch (error) {
       console.error(`Bulk update failed for ${collectionName}:`, error);
@@ -383,7 +411,6 @@ export function AdminCollectionEditor({
     setSaving(true);
     try {
       await Promise.all(selectedIds.map((itemId) => deleteDoc(doc(db, collectionName, itemId))));
-      await fetchItems();
       await loadCollections();
     } catch (error) {
       console.error(`Bulk delete failed for ${collectionName}:`, error);
@@ -403,7 +430,6 @@ export function AdminCollectionEditor({
       updateDoc(doc(db, collectionName, item.id), { [sortField]: Number(swapWith[sortField] || 0) }),
       updateDoc(doc(db, collectionName, swapWith.id), { [sortField]: Number(item[sortField] || 0) }),
     ]);
-    await fetchItems();
     await loadCollections();
   };
 
@@ -423,7 +449,6 @@ export function AdminCollectionEditor({
       await Promise.all(
         sortedItems.map((entry, index) => updateDoc(doc(db, collectionName, entry.id), { [sortField]: index + 1 }))
       );
-      await fetchItems();
       await loadCollections();
     } catch (error) {
       console.error(`Failed to reorder ${collectionName}:`, error);
@@ -442,6 +467,21 @@ export function AdminCollectionEditor({
 
   return (
     <div className="space-y-6">
+      <AnimatePresence>
+        {notice && (
+          <motion.div
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
+            className={`fixed right-6 top-6 z-[70] rounded-xl px-4 py-3 text-sm font-bold shadow-xl ${
+              notice.type === "error" ? "bg-red-600 text-white" : "bg-emerald-600 text-white"
+            }`}
+          >
+            {notice.text}
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-4">
         <div>
           <h1 className="text-2xl md:text-3xl font-extrabold text-slate-850 dark:text-slate-50 font-serif">{title}</h1>

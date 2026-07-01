@@ -367,7 +367,7 @@ export function Chatbot() {
             initial={{ opacity: 0, scale: 0.8, y: 15 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.8 }}
-            className="fixed bottom-20 right-6 z-45 max-w-[240px] bg-slate-900 text-white rounded-2xl p-4 shadow-xl border border-white/10 text-xs font-bold leading-normal select-none"
+            className="fixed bottom-20 right-6 z-[950] max-w-[240px] bg-slate-900 text-white rounded-2xl p-4 shadow-xl border border-white/10 text-xs font-bold leading-normal select-none"
           >
             <button
               onClick={() => { setShowNudge(false); setUnread(0); }}

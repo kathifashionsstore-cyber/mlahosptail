@@ -1,5 +1,6 @@
 import React from "react";
 import AdminCollectionEditor from "./AdminCollectionEditor";
+import ReviewsQueue from "./ReviewsQueue";
 
 const activeOrderFields = [
   {
@@ -276,24 +277,7 @@ export function AdminBlog() {
 }
 
 export function AdminReviewsQueue() {
-  return (
-    <AdminCollectionEditor
-      collectionName="testimonials"
-      title="Reviews Queue"
-      description="Moderate patient reviews, approval status, ratings, treatment tags, and patient photos."
-      fields={[
-        { name: "photoUrl", label: "Patient Photo URL / Upload", type: "image", wide: true },
-        { name: "patientName", label: "Patient Name", type: "text", required: true },
-        { name: "reviewText", label: "Review Text", type: "textarea", wide: true, required: true },
-        { name: "rating", label: "Rating", type: "number", default: 5 },
-        { name: "treatmentTaken", label: "Treatment Taken", type: "text" },
-        { name: "isApproved", label: "Approved", type: "checkbox", default: false, checkboxLabel: "Visible on public site" },
-        { name: "isActive", label: "Active", type: "checkbox", default: true, checkboxLabel: "Keep in review queue" },
-        { name: "order", label: "Order", type: "number", default: 1 },
-      ]}
-      idField="patientName"
-    />
-  );
+  return <ReviewsQueue />;
 }
 
 export function AdminFestivalBanners() {

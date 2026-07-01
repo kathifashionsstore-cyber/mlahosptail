@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useRef } from "react";
 import { Link } from "react-router-dom";
 import { AnimatePresence, motion, useInView } from "framer-motion";
-import { Phone, Sparkles, ChevronLeft, ChevronRight } from "lucide-react";
+import { Phone, Sparkles, ChevronLeft, ChevronRight, Star } from "lucide-react";
 import { useApp } from "../../context/AppContext";
 
 const containerVariants = {
@@ -35,48 +35,58 @@ const DEFAULT_HERO_SLIDES = [
   { id: "hero-slide-5", slotKey: "hero-slide-5", imageUrl: FALLBACK_HERO_IMAGES[4] }
 ];
 
-const heroTrustItems = [
+const _heroTrustItems = [
   { value: "15+", label: "Years Experience" },
   { value: "5000+", label: "Surgeries Performed" },
   { value: "4.9★", label: "Patient Rating" }
 ];
 
-function CountUp({ value, suffix }) {
+const heroTrustDisplayItems = [
+  { value: 15, suffix: "+", label: "Years Experience" },
+  { value: 5000, suffix: "+", label: "Surgeries Performed" },
+  { value: 4.9, suffix: "", decimals: 1, showStar: true, label: "Patient Rating" }
+];
+
+function CountUp({ value, suffix = "", decimals = 0 }) {
   const [count, setCount] = useState(0);
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true, margin: "-50px" });
 
   useEffect(() => {
     if (!isInView) return;
-    const numericPart = parseInt(value.replace(/[^0-9]/g, ""), 10);
-    if (isNaN(numericPart)) {
+    const end = Number(value);
+    if (!Number.isFinite(end)) {
       setCount(value);
       return;
     }
 
-    let start = 0;
-    const end = numericPart;
     const duration = 1000;
     const steps = 50;
     const stepTime = duration / steps;
-    const increment = Math.ceil(end / steps);
+    const increment = end / steps;
+    let currentStep = 0;
 
     const timer = setInterval(() => {
-      start += increment;
-      if (start >= end) {
+      currentStep += 1;
+      if (currentStep >= steps) {
         setCount(end);
         clearInterval(timer);
       } else {
-        setCount(start);
+        setCount(increment * currentStep);
       }
     }, stepTime);
 
     return () => clearInterval(timer);
-  }, [isInView, value]);
+  }, [decimals, isInView, value]);
 
   return (
     <span ref={ref}>
-      {typeof count === "number" ? count.toLocaleString() : count}
+      {typeof count === "number"
+        ? count.toLocaleString(undefined, {
+            minimumFractionDigits: decimals,
+            maximumFractionDigits: decimals,
+          })
+        : count}
       {suffix}
     </span>
   );
@@ -216,7 +226,7 @@ export function HeroSlider() {
           >
             {/* Small Label Chip */}
             <motion.div variants={textItemVariants} className="inline-block">
-              <span className="relative inline-flex items-center text-xs font-extrabold uppercase tracking-widest text-[#D81F26] border-l-2 border-l-[#D81F26] pl-3 py-0.5 select-none">
+              <span className="relative inline-flex items-center border-l-[3px] border-l-[#D81F26] py-0.5 pl-3 text-[12px] font-bold uppercase tracking-[2px] text-[#D81F26] select-none">
                 Narasaraopet's #1 Orthopaedic Center
               </span>
             </motion.div>
@@ -224,7 +234,7 @@ export function HeroSlider() {
             {/* Bold Main Heading */}
             <motion.h1
               variants={textItemVariants}
-              className="text-3.5xl md:text-5xl lg:text-[46px] xl:text-[54px] font-extrabold leading-[1.1] tracking-tight text-slate-900 dark:text-white font-serif"
+              className="font-serif text-[clamp(36px,5.5vw,56px)] font-extrabold leading-[1.1] tracking-normal text-[#0D2137] dark:text-white"
             >
               Expert Care for Spine, Joint & Trauma
             </motion.h1>
@@ -232,7 +242,7 @@ export function HeroSlider() {
             {/* Subheading Statement */}
             <motion.p
               variants={textItemVariants}
-              className="text-sm font-semibold leading-relaxed text-slate-500 dark:text-slate-400 max-w-lg"
+              className="max-w-[480px] text-[17px] font-normal leading-[1.7] text-[#4B5563] dark:text-slate-300"
             >
               Amulya Hospital has provided dedicated orthopedic surgeries, trauma triage, and deformity corrections in Narasaraopet for over three decades.
             </motion.p>
@@ -262,24 +272,27 @@ export function HeroSlider() {
               variants={textItemVariants}
               className="grid grid-cols-3 gap-4 pt-6 border-t border-slate-100 dark:border-slate-805/40 text-left max-w-lg select-none"
             >
-              {heroTrustItems.map((item) => {
-                const numericPart = item.value.replace(/[^0-9]/g, "");
-                const suffix = item.value.replace(/[0-9]/g, "");
-                return (
-                  <div key={item.label} className="space-y-0.5">
-                    <p className="text-lg md:text-2xl font-extrabold text-[#D81F26] dark:text-[#E25C62] tracking-tight">
-                      {prefersReducedMotion ? (
-                        <span>{item.value}</span>
-                      ) : (
-                        <CountUp value={numericPart} suffix={suffix} />
-                      )}
-                    </p>
-                    <p className="text-[9px] md:text-[10px] font-extrabold text-slate-400 dark:text-slate-500 uppercase tracking-widest leading-snug">
-                      {item.label}
-                    </p>
-                  </div>
-                );
-              })}
+              {heroTrustDisplayItems.map((item) => (
+                <div key={item.label} className="space-y-1">
+                  <p className="flex items-center gap-1 text-[32px] font-extrabold leading-none tracking-normal text-[#D81F26] dark:text-[#E25C62]">
+                    {prefersReducedMotion ? (
+                      <span>
+                        {Number(item.value).toLocaleString(undefined, {
+                          minimumFractionDigits: item.decimals || 0,
+                          maximumFractionDigits: item.decimals || 0,
+                        })}
+                        {item.suffix}
+                      </span>
+                    ) : (
+                      <CountUp value={item.value} suffix={item.suffix} decimals={item.decimals || 0} />
+                    )}
+                    {item.showStar && <Star className="h-6 w-6 fill-amber-400 stroke-amber-400" />}
+                  </p>
+                  <p className="text-[11px] font-semibold uppercase leading-snug tracking-[1.5px] text-[#6B7280] dark:text-slate-400">
+                    {item.label}
+                  </p>
+                </div>
+              ))}
             </motion.div>
           </motion.div>
         </div>

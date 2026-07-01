@@ -397,6 +397,10 @@ export function ImageManager() {
           { key: "home-why-choose-bg", label: "Why Choose Us Section Background", def: "" },
           { key: "home-cta-bg", label: "Bottom CTA Banner Background", def: FALLBACKS.hospital },
           { key: "home-services-bg", label: "Services Section Background", def: "" },
+          { key: "home-doctor-photo-1", label: "Dr. Amulya (Home Carousel)", def: "" },
+          { key: "home-doctor-photo-2", label: "Dr. Ravindranath (Home Carousel)", def: "" },
+          { key: "home-doctor-photo-3", label: "Dr. Tejaswi (Home Carousel)", def: "" },
+          { key: "home-doctor-photo-4", label: "Dr. Bharat (Home Carousel)", def: "" },
         ];
       case "about":
         return [
@@ -716,6 +720,26 @@ export function ImageManager() {
               </section>
             );
           })}
+        </div>
+      ) : activeCategory === "home" ? (
+        <div className="space-y-6">
+          <div className="space-y-4">
+            <div className="border-b pb-2 text-left">
+              <h3 className="text-xs font-black text-[#0B3C5D] dark:text-white uppercase tracking-wider">Home Page Section Layouts</h3>
+            </div>
+            {buildSlots("home")
+              .filter(slot => !slot.key.startsWith("home-doctor-photo-"))
+              .map((slot) => renderSlotCard(slot))}
+          </div>
+
+          <div className="space-y-4 pt-4">
+            <div className="border-b pb-2 text-left">
+              <h3 className="text-xs font-black text-[#0B3C5D] dark:text-white uppercase tracking-wider">Doctor Homepage Photo Slots</h3>
+            </div>
+            {buildSlots("home")
+              .filter(slot => slot.key.startsWith("home-doctor-photo-"))
+              .map((slot) => renderSlotCard(slot))}
+          </div>
         </div>
       ) : (
         <div className="space-y-4">

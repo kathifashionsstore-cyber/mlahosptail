@@ -4,8 +4,10 @@ import { Helmet } from "react-helmet-async";
 import { motion, AnimatePresence, useInView } from "framer-motion";
 import { ArrowRight, BadgeCheck, CalendarCheck, Clock, Phone, Star, Users, Award } from "lucide-react";
 import { useApp } from "../context/AppContext";
+import { getDoctorPhoto } from "../hooks/useDoctorPhoto";
 import { db } from "../firebase/config";
-import { collection, limit, onSnapshot, orderBy, query, where } from "firebase/firestore";
+import { collection, onSnapshot, orderBy, query, where } from "firebase/firestore";
+import { fetchApprovedReviews } from "../utils/reviews";
 import HeroSlider from "../components/home/HeroSlider";
 import { buildSeedPlan } from "../firebase/seedDataHelpers";
 import {
@@ -82,13 +84,13 @@ function CountUp({ value, suffix }) {
 }
 
 export function Home() {
-  const { doctors, insurance, settings, services, getImageUrl } = useApp();
+  const { doctors, insurance, settings, services, siteImages, getImageUrl } = useApp();
   const [statistics, setStatistics] = useState([]);
   const [testimonials, setTestimonials] = useState([]);
 
   useEffect(() => {
     const statsQuery = query(collection(db, "statistics"), where("isActive", "==", true), orderBy("order", "asc"));
-    const testimonialsQuery = query(collection(db, "testimonials"), where("isApproved", "==", true), limit(5));
+    let cancelled = false;
 
     const unsubscribeStats = onSnapshot(
       statsQuery,
@@ -101,20 +103,18 @@ export function Home() {
       }
     );
 
-    const unsubscribeTestimonials = onSnapshot(
-      testimonialsQuery,
-      (snapshot) => {
-        setTestimonials(snapshot.empty ? getFallbackHomeCollection("testimonials") : snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() })));
-      },
-      (err) => {
+    fetchApprovedReviews(db, getFallbackHomeCollection("testimonials"))
+      .then((approvedReviews) => {
+        if (!cancelled) setTestimonials(approvedReviews.slice(0, 5));
+      })
+      .catch((err) => {
         console.error("Error loading homepage testimonials:", err);
-        setTestimonials(getFallbackHomeCollection("testimonials"));
-      }
-    );
+        if (!cancelled) setTestimonials(getFallbackHomeCollection("testimonials").slice(0, 5));
+      });
 
     return () => {
+      cancelled = true;
       unsubscribeStats();
-      unsubscribeTestimonials();
     };
   }, []);
 
@@ -376,7 +376,7 @@ export function Home() {
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 max-w-6xl mx-auto">
-            {featuredDoctors.map((docItem) => (
+            {featuredDoctors.map((docItem, idx) => (
               <motion.article
                 key={docItem.id}
                 whileHover={{ y: -8 }}
@@ -390,7 +390,7 @@ export function Home() {
                     <div className="relative mx-auto w-full max-w-[220px] overflow-hidden rounded-[24px] bg-gradient-to-br from-[#E7F3FA] to-[#EAFBF0] shadow-[0_18px_44px_rgba(15,76,129,0.14)] md:mx-0">
                       <div className="aspect-[4/5]">
                         <img
-                          src={getImageUrl(`doctor-photo-${docItem.slug || docItem.id}`, docItem.photoUrl || "https://images.unsplash.com/photo-1622253692010-333f2da6031d?auto=format&fit=crop&w=400&q=80")}
+                          src={getDoctorPhoto(docItem, idx + 1, siteImages)}
                           alt={docItem.name}
                           className="h-full w-full object-cover transition duration-700 group-hover:scale-110"
                         />

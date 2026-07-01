@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from "react";
-import { collection, query, where, getDocs, addDoc, serverTimestamp, orderBy } from "firebase/firestore";
+import { collection, addDoc, serverTimestamp } from "firebase/firestore";
 import { db } from "../firebase/config";
 import { useApp } from "../context/AppContext";
+import { fetchApprovedReviews, REVIEWS_COLLECTION } from "../utils/reviews";
 import { useForm } from "react-hook-form";
 import { uploadImageToImgbb } from "../utils/imgbbUpload";
 import { Star, CheckCircle2, User } from "lucide-react";
@@ -34,9 +35,8 @@ export function Testimonials() {
 
   const fetchReviews = async () => {
     try {
-      const q = query(collection(db, "testimonials"), where("isApproved", "==", true), orderBy("createdAt", "desc"));
-      const querySnap = await getDocs(q);
-      setReviews(querySnap.docs.map((docSnap) => ({ id: docSnap.id, ...docSnap.data() })));
+      const approvedReviews = await fetchApprovedReviews(db);
+      setReviews(approvedReviews);
     } catch (err) {
       console.error("Failed to load patient reviews:", err);
     } finally {
@@ -81,12 +81,14 @@ export function Testimonials() {
     }
 
     try {
-      await addDoc(collection(db, "testimonials"), {
+      await addDoc(collection(db, REVIEWS_COLLECTION), {
         patientName: data.patientName,
         rating: ratingInput,
         reviewText: data.reviewText,
         treatmentTaken: data.treatmentTaken,
         photoUrl,
+        source: "Direct",
+        status: "pending",
         isApproved: false,
         isFeaturedOnHome: false,
         createdAt: serverTimestamp(),

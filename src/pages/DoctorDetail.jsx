@@ -4,12 +4,14 @@ import { doc, getDoc } from "firebase/firestore";
 import { db } from "../firebase/config";
 import { useApp } from "../context/AppContext";
 import { UserRound, Clock, Languages, Award, ChevronLeft, Calendar } from "lucide-react";
+import { useDoctorPhoto } from "../hooks/useDoctorPhoto";
 
 export function DoctorDetail() {
   const { doctorId } = useParams();
   const { doctors, treatments, getImageUrl } = useApp();
   const [doctor, setDoctor] = useState(null);
   const [loading, setLoading] = useState(true);
+  const doctorPhoto = useDoctorPhoto(doctor);
 
   useEffect(() => {
     const cachedDoc = doctors.find((d) => d.id === doctorId);
@@ -86,8 +88,8 @@ export function DoctorDetail() {
           <div className="flex justify-center">
             <div className="w-48 h-48 md:w-56 md:h-56 rounded-full bg-gradient-to-br from-[#1E7FC2] to-[#0B3C5D] flex items-center justify-center text-white shadow-lg overflow-hidden border-4 border-white dark:border-slate-800 relative">
               <img
-                src={getImageUrl(`doctor-photo-${doctor.slug || doctor.id}`, doctor.photoUrl || "https://images.unsplash.com/photo-1622253692010-333f2da6031d?auto=format&fit=crop&w=400&q=80")}
-                alt={doctor.name}
+                src={doctorPhoto}
+                alt={doctor?.name || "Doctor"}
                 className="w-full h-full object-cover"
               />
             </div>
