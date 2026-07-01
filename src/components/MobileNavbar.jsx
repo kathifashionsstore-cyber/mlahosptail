@@ -57,60 +57,60 @@ export function MobileNavbar() {
 
   return (
     <>
-      {/* 1. Bottom-Fixed Mobile Tab Bar (Visible on mobile screens only) */}
-      <div className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/95 dark:bg-slate-900/95 border-t border-slate-100 dark:border-slate-800 backdrop-blur-md shadow-[0_-4px_16px_rgba(15,27,36,0.08)] pb-safe">
-        <div className="grid grid-cols-5 h-16 items-center px-2">
-          {/* Tab 1: Home */}
-          <NavLink to="/" className={navLinkClass}>
-            {({ isActive }) => (
-              <>
-                <Home className={`w-5 h-5 mb-0.5 ${isActive ? "stroke-[2.5px] fill-brand-blue text-brand-blue" : "stroke-[2px]"}`} />
-                <span>Home</span>
-              </>
-            )}
-          </NavLink>
+       {/* 1. Bottom-Fixed Mobile Tab Bar (Visible on mobile screens only) */}
+       <div className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/95 dark:bg-slate-900/95 border-t border-slate-100 dark:border-slate-800 backdrop-blur-md shadow-[0_-4px_16px_rgba(15,27,36,0.08)] pb-safe">
+         <div className="grid grid-cols-5 h-16 items-center px-2">
+           {/* Tab 1: Services */}
+           <NavLink to="/services" className={navLinkClass}>
+             {({ isActive }) => (
+               <>
+                 <LayoutGrid className={`w-5 h-5 mb-0.5 ${isActive ? "stroke-[2.5px] fill-brand-blue text-brand-blue" : "stroke-[2px]"}`} />
+                 <span>Services</span>
+               </>
+             )}
+           </NavLink>
  
-          {/* Tab 2: Doctors */}
-          <NavLink to="/doctors" className={navLinkClass}>
-            {({ isActive }) => (
-              <>
-                <Users className={`w-5 h-5 mb-0.5 ${isActive ? "stroke-[2.5px] fill-brand-blue text-brand-blue" : "stroke-[2px]"}`} />
-                <span>Doctors</span>
-              </>
-            )}
-          </NavLink>
+           {/* Tab 2: Gallery */}
+           <NavLink to="/gallery" className={navLinkClass}>
+             {({ isActive }) => (
+               <>
+                 <Image className={`w-5 h-5 mb-0.5 ${isActive ? "stroke-[2.5px] fill-brand-blue text-brand-blue" : "stroke-[2px]"}`} />
+                 <span>Gallery</span>
+               </>
+             )}
+           </NavLink>
  
-          {/* Tab 3: Book Appointment (Raised Center Tab) */}
-          <div className="flex justify-center -mt-6">
-            <Link
-              to="/book-appointment"
-              className="w-14 h-14 rounded-full bg-brand-red text-white flex flex-col items-center justify-center shadow-lg shadow-brand-red/35 border-4 border-slate-50 dark:border-slate-950 transform active:scale-95 transition-transform duration-100"
-            >
-              <Calendar className="w-5 h-5 stroke-[2.5px]" />
-              <span className="text-[9px] font-extrabold uppercase mt-0.5 tracking-wider">Book</span>
-            </Link>
-          </div>
+           {/* Tab 3: Home (Raised Center Tab) */}
+           <div className="flex justify-center -mt-6">
+             <Link
+               to="/"
+               className="w-14 h-14 rounded-full bg-brand-red text-white flex flex-col items-center justify-center shadow-lg shadow-brand-red/35 border-4 border-slate-50 dark:border-slate-950 transform active:scale-95 transition-transform duration-100"
+             >
+               <Home className="w-5 h-5 stroke-[2.5px]" />
+               <span className="text-[9px] font-extrabold uppercase mt-0.5 tracking-wider">Home</span>
+             </Link>
+           </div>
  
-          {/* Tab 4: Services */}
-          <NavLink to="/services" className={navLinkClass}>
-            {({ isActive }) => (
-              <>
-                <LayoutGrid className={`w-5 h-5 mb-0.5 ${isActive ? "stroke-[2.5px] fill-brand-blue text-brand-blue" : "stroke-[2px]"}`} />
-                <span>Services</span>
-              </>
-            )}
-          </NavLink>
-
-          {/* Tab 5: Menu */}
-          <button
-            onClick={() => setIsDrawerOpen(true)}
-            className="flex flex-col items-center justify-center py-2 text-xs font-semibold text-slate-400 dark:text-slate-500 active:text-slate-600 dark:active:text-slate-300"
-          >
-            <Menu className="w-5 h-5 mb-0.5" />
-            <span>Menu</span>
-          </button>
-        </div>
-      </div>
+           {/* Tab 4: Book Appointment */}
+           <NavLink to="/book-appointment" className={navLinkClass}>
+             {({ isActive }) => (
+               <>
+                 <Calendar className={`w-5 h-5 mb-0.5 ${isActive ? "stroke-[2.5px] fill-brand-blue text-brand-blue" : "stroke-[2px]"}`} />
+                 <span>Book</span>
+               </>
+             )}
+           </NavLink>
+ 
+           {/* Tab 5: Menu */}
+           <button
+             onClick={() => setIsDrawerOpen(true)}
+             className="flex flex-col items-center justify-center py-2 text-xs font-semibold text-slate-400 dark:text-slate-500 active:text-slate-600 dark:active:text-slate-300"
+           >
+             <Menu className="w-5 h-5 mb-0.5" />
+             <span>Menu</span>
+           </button>
+         </div>
+       </div>
 
       {/* 2. Slide-In Mobile Drawer */}
       <AnimatePresence>
@@ -157,6 +157,13 @@ export function MobileNavbar() {
                 >
                   <Info className="w-5 h-5 text-slate-400" />
                   <span>About Hospital</span>
+                </Link>
+                <Link
+                  to="/doctors"
+                  className="flex items-center space-x-3 text-slate-700 dark:text-slate-300 font-semibold py-2"
+                >
+                  <Users className="w-5 h-5 text-slate-400" />
+                  <span>Meet Our Doctors</span>
                 </Link>
                 <Link
                   to="/services"

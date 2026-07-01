@@ -463,23 +463,58 @@ export function AppProvider({ children }) {
         imagesSnap
       ] = await withTimeout(
         Promise.all([
-          getDocs(query(collection(db, "doctors"), where("isActive", "==", true), orderBy("order", "asc"))),
-          getDocs(query(collection(db, "departments"), where("isActive", "==", true), orderBy("order", "asc"))),
-          getDocs(query(collection(db, "treatments"), where("isActive", "==", true), orderBy("order", "asc"))),
-          getDocs(query(collection(db, "serviceCategories"), where("isActive", "==", true), orderBy("order", "asc"))),
-          getDocs(query(collection(db, "services"), where("isActive", "==", true), orderBy("order", "asc"))),
-          getDocs(query(collection(db, "insurancePartners"), where("isActive", "==", true), orderBy("order", "asc"))),
+          getDocs(collection(db, "doctors")),
+          getDocs(collection(db, "departments")),
+          getDocs(collection(db, "treatments")),
+          getDocs(collection(db, "serviceCategories")),
+          getDocs(collection(db, "services")),
+          getDocs(collection(db, "insurancePartners")),
           getDocs(collection(db, "siteImages"))
         ]),
-        5000
+        10000
       );
 
-      const docsList = docsSnap.empty ? getFallbackCollection("doctors") : docsSnap.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
-      const deptsList = deptsSnap.empty ? getFallbackCollection("departments") : deptsSnap.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
-      const trtsList = trtsSnap.empty ? getFallbackCollection("treatments") : trtsSnap.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
-      const catsList = catsSnap.empty ? getFallbackCollection("serviceCategories") : catsSnap.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
-      const srvsList = srvsSnap.empty ? getFallbackCollection("services") : srvsSnap.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
-      const insList = insSnap.empty ? getFallbackCollection("insurancePartners") : insSnap.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+      const docsList = docsSnap.empty
+        ? getFallbackCollection("doctors")
+        : docsSnap.docs
+            .map((docSnap) => ({ id: docSnap.id, ...docSnap.data() }))
+            .filter((item) => item.isActive !== false)
+            .sort((a, b) => Number(a.order || 0) - Number(b.order || 0));
+
+      const deptsList = deptsSnap.empty
+        ? getFallbackCollection("departments")
+        : deptsSnap.docs
+            .map((docSnap) => ({ id: docSnap.id, ...docSnap.data() }))
+            .filter((item) => item.isActive !== false)
+            .sort((a, b) => Number(a.order || 0) - Number(b.order || 0));
+
+      const trtsList = trtsSnap.empty
+        ? getFallbackCollection("treatments")
+        : trtsSnap.docs
+            .map((docSnap) => ({ id: docSnap.id, ...docSnap.data() }))
+            .filter((item) => item.isActive !== false)
+            .sort((a, b) => Number(a.order || 0) - Number(b.order || 0));
+
+      const catsList = catsSnap.empty
+        ? getFallbackCollection("serviceCategories")
+        : catsSnap.docs
+            .map((docSnap) => ({ id: docSnap.id, ...docSnap.data() }))
+            .filter((item) => item.isActive !== false)
+            .sort((a, b) => Number(a.order || 0) - Number(b.order || 0));
+
+      const srvsList = srvsSnap.empty
+        ? getFallbackCollection("services")
+        : srvsSnap.docs
+            .map((docSnap) => ({ id: docSnap.id, ...docSnap.data() }))
+            .filter((item) => item.isActive !== false)
+            .sort((a, b) => Number(a.order || 0) - Number(b.order || 0));
+
+      const insList = insSnap.empty
+        ? getFallbackCollection("insurancePartners")
+        : insSnap.docs
+            .map((docSnap) => ({ id: docSnap.id, ...docSnap.data() }))
+            .filter((item) => item.isActive !== false)
+            .sort((a, b) => Number(a.order || 0) - Number(b.order || 0));
 
       const imagesMap = {};
       if (!imagesSnap.empty) {

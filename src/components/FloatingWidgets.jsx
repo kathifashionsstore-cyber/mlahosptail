@@ -66,7 +66,7 @@ export function FloatingWidgets() {
   return (
     <>
       {/* Left-Side: Back to Top Button */}
-      <div className="fixed bottom-6 left-6 z-[900]">
+      <div className="fixed bottom-20 left-4 md:bottom-6 md:left-6 z-[900]">
         <AnimatePresence>
           {showBackToTop && (
             <motion.button
@@ -84,7 +84,7 @@ export function FloatingWidgets() {
       </div>
 
       {/* Right-Side: Book, Call, WhatsApp Buttons Stack */}
-      <div className="floating-widget-stack fixed bottom-6 right-6 flex flex-col space-y-3 z-[900] items-end">
+      <div className="floating-widget-stack fixed bottom-20 right-4 md:bottom-6 md:right-6 flex flex-col space-y-3 z-[900] items-end">
         {/* Book Appointment (Red/Accent) */}
         <FloatingAction to="/book-appointment" label="Book Appointment" className="bg-[#D81F26] hover:bg-[#B3151B]">
           <Calendar className="w-5.5 h-5.5" />

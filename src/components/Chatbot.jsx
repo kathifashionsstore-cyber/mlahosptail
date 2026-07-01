@@ -403,7 +403,7 @@ export function Chatbot() {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 80, scale: 0.95 }}
             transition={{ duration: 0.25, ease: "easeOut" }}
-            className="fixed bottom-0 right-0 z-50 w-full h-full md:bottom-20 md:right-6 md:w-[380px] md:h-[600px] md:max-h-[85vh] bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-850 md:rounded-3xl shadow-2xl flex flex-col overflow-hidden"
+            className="fixed bottom-20 right-4 z-50 w-[calc(100%-2rem)] max-w-[360px] h-[450px] md:bottom-20 md:right-6 md:w-[380px] md:h-[600px] md:max-h-[85vh] bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-850 rounded-3xl shadow-2xl flex flex-col overflow-hidden"
           >
             {/* Header lockup */}
             <div className="bg-[#0B3C5D] text-white p-4 flex items-center justify-between shadow-sm">
