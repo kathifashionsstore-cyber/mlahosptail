@@ -19,9 +19,16 @@ export function Blog() {
   // Fetch blogs list
   const fetchBlogs = async () => {
     try {
-      const q = query(collection(db, "blogs"), where("isPublished", "==", true), orderBy("publishedAt", "desc"));
-      const querySnap = await getDocs(q);
-      setBlogs(querySnap.docs.map((docSnap) => ({ id: docSnap.id, ...docSnap.data() })));
+      const querySnap = await getDocs(collection(db, "blogs"));
+      const list = querySnap.docs.map((docSnap) => ({ id: docSnap.id, ...docSnap.data() }));
+      const published = list
+        .filter((b) => b.isPublished === true)
+        .sort((a, b) => {
+          const tA = a.publishedAt?.seconds || new Date(a.publishedAt || 0).getTime() / 1000;
+          const tB = b.publishedAt?.seconds || new Date(b.publishedAt || 0).getTime() / 1000;
+          return tB - tA;
+        });
+      setBlogs(published);
     } catch (err) {
       console.error("Failed to load blog articles:", err);
     } finally {
@@ -37,14 +44,14 @@ export function Blog() {
       // Detail View
       const fetchBlogDetail = async () => {
         try {
-          const q = query(collection(db, "blogs"), where("slug", "==", slug), where("isPublished", "==", true), limit(1));
-          const querySnap = await getDocs(q);
-          if (!querySnap.empty) {
-            const blogData = { id: querySnap.docs[0].id, ...querySnap.docs[0].data() };
-            setBlog(blogData);
+          const querySnap = await getDocs(collection(db, "blogs"));
+          const list = querySnap.docs.map((docSnap) => ({ id: docSnap.id, ...docSnap.data() }));
+          const found = list.find((b) => b.slug === slug && b.isPublished === true);
+          if (found) {
+            setBlog(found);
 
             // Increment views count in Firestore
-            const blogDocRef = doc(db, "blogs", blogData.id);
+            const blogDocRef = doc(db, "blogs", found.id);
             await updateDoc(blogDocRef, {
               views: increment(1),
             });
