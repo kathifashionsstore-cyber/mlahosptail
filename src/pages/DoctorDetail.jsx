@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useParams, Link } from "react-router-dom";
+import { Helmet } from "react-helmet-async";
 import { doc, getDoc } from "firebase/firestore";
 import { db } from "../firebase/config";
 import { useApp } from "../context/AppContext";
@@ -72,6 +73,41 @@ export function DoctorDetail() {
 
   return (
     <div className="pt-24 min-h-screen bg-white dark:bg-slate-950 transition-colors duration-300">
+      <Helmet>
+        <title>{`Dr. ${doctor.name} | ${doctor.designation || 'Orthopaedic Specialist'} | Amulya Hospital`}</title>
+        <meta
+          name="description"
+          content={`Consult Dr. ${doctor.name}, ${doctor.designation || 'specialist surgeon'} at Amulya Hospital, Narasaraopet. Specializing in ${doctor.speciality || 'orthopaedics and trauma care'}. Experience: ${doctor.experience || 'Over 20 Years'}. Book appointment online.`}
+        />
+        <meta name="keywords" content={`Dr. ${doctor.name}, orthopedic surgeon narasaraopet, spine doctor amulya hospital, best trauma surgeon palnadu`} />
+        <link rel="canonical" href={window.location.href} />
+        
+        {/* Physician JSON-LD Schema */}
+        <script type="application/ld+json">
+          {JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "Physician",
+            "@id": `${window.location.href}#physician`,
+            "name": `Dr. ${doctor.name}`,
+            "image": doctorPhoto,
+            "description": doctor.bio || doctor.designation,
+            "telephone": "+918647223625",
+            "medicalSpecialty": doctor.speciality || "OrthopedicSurgery",
+            "worksFor": {
+              "@type": "Hospital",
+              "name": "Amulya Nursing Home",
+              "address": {
+                "@type": "PostalAddress",
+                "streetAddress": "30/13, Guntur Rd, Panasathota, Barampet",
+                "addressLocality": "Narasaraopeta",
+                "addressRegion": "Andhra Pradesh",
+                "postalCode": "522601",
+                "addressCountry": "IN"
+              }
+            }
+          })}
+        </script>
+      </Helmet>
       <div className="max-w-7xl mx-auto px-6 md:px-8 py-8 space-y-12">
         {/* Back Link */}
         <Link

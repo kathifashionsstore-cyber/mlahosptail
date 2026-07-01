@@ -148,11 +148,68 @@ export function Home() {
   return (
     <div className="overflow-hidden bg-white dark:bg-slate-950 transition-colors duration-300">
       <Helmet>
-        <title>Amulya Hospital | Spine, Joint & Trauma Care</title>
+        <title>{settings?.hospitalName || "Amulya Hospital"} | Spine, Joint & Trauma Care</title>
         <meta
           name="description"
-          content="Amulya Hospital provides orthopaedic, spine, joint, trauma, emergency, and rehabilitation care in Narasaraopet."
+          content={settings?.tagline ? `${settings.hospitalName} - ${settings.tagline}. Located at ${settings.address || 'Narasaraopet, Palnadu District'}.` : "Amulya Hospital provides orthopaedic, spine, joint, trauma, emergency, and rehabilitation care in Narasaraopet."}
         />
+        <meta name="keywords" content="hospital in narasaraopet, orthopaedic hospital near me, spine specialist near me, joint replacement hospital, trauma care 24/7, amulya nursing home, best hospital in narasaraopet, palnadu hospital, nearby hospital" />
+        
+        {/* Open Graph */}
+        <meta property="og:title" content={`${settings?.hospitalName || "Amulya Hospital"} | Spine, Joint & Trauma Care`} />
+        <meta property="og:description" content="Amulya Hospital provides orthopaedic, spine, joint, trauma, emergency, and rehabilitation care in Narasaraopet." />
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content={window.location.origin} />
+        <meta property="og:image" content={settings?.logoUrl || `${window.location.origin}/logo.png`} />
+
+        {/* Structured Data: Local Business / Hospital */}
+        <script type="application/ld+json">
+          {JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "Hospital",
+            "@id": `${window.location.origin}/#hospital`,
+            "name": settings?.hospitalName || "Amulya Nursing Home",
+            "alternateName": ["Amulya Hospital", "Amulya Orthopaedic Hospital", "Amulya Spine & Joint Replacement Center"],
+            "description": settings?.tagline || "Center for Trauma, Spine, Polio & Joint Replacements",
+            "url": window.location.origin,
+            "logo": settings?.logoUrl || `${window.location.origin}/logo.png`,
+            "image": settings?.logoUrl || `${window.location.origin}/logo.png`,
+            "telephone": settings?.phoneNumbers?.[0]?.number || "+918647223625",
+            "priceRange": "$$",
+            "address": {
+              "@type": "PostalAddress",
+              "streetAddress": settings?.address || "30/13, 18-1, Guntur Rd, Panasathota, Barampet",
+              "addressLocality": "Narasaraopeta",
+              "addressRegion": "Andhra Pradesh",
+              "postalCode": "522601",
+              "addressCountry": "IN"
+            },
+            "geo": {
+              "@type": "GeoCoordinates",
+              "latitude": "16.235700",
+              "longitude": "80.046711"
+            },
+            "hasMap": settings?.mapEmbedUrl || "https://maps.google.com/?q=Amulya+Nursing+Home+Narasaraopet",
+            "openingHoursSpecification": {
+              "@type": "OpeningHoursSpecification",
+              "dayOfWeek": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"],
+              "opens": "10:00",
+              "closes": "19:00"
+            },
+            "emergencyService": true,
+            "contactPoint": {
+              "@type": "ContactPoint",
+              "telephone": settings?.phoneNumbers?.[0]?.number || "+918647223625",
+              "contactType": "emergency",
+              "availableLanguage": ["English", "Telugu", "Hindi"]
+            },
+            "medicalSpecialty": [
+              "Orthopedics",
+              "EmergencyMedicine",
+              "PhysicalTherapy"
+            ]
+          })}
+        </script>
       </Helmet>
 
       {/* 1. Hero Slider */}

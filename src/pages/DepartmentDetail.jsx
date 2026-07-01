@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { useParams, Link } from "react-router-dom";
+import { Helmet } from "react-helmet-async";
 import { motion } from "framer-motion";
 import { ShieldCheck, Crosshair, ArrowRight, HelpCircle, UserCheck, Star, Clock, Zap } from "lucide-react";
 import { useApp } from "../context/AppContext";
@@ -132,6 +133,15 @@ export function DepartmentDetail() {
   // Layout Themes based on LayoutStyle property
   return (
     <div className="pt-24 min-h-screen bg-surface-light dark:bg-surface-dark transition-colors duration-300">
+      <Helmet>
+        <title>{`${config.name} | Amulya Hospital | Narasaraopet`}</title>
+        <meta
+          name="description"
+          content={`${config.name} at Amulya Hospital: ${config.overview} Located in Narasaraopet, Palnadu. Expert treatment, modular surgical theaters, and rehabilitative care.`}
+        />
+        <meta name="keywords" content={`${config.name} narasaraopet, orthopedic hospital, spine surgery, joint replacement, amulya nursing home specialty`} />
+        <link rel="canonical" href={window.location.href} />
+      </Helmet>
       {/* 1. Cinematic Specialty Hero */}
       <section className="premium-banner text-white py-20 px-6 md:px-12 relative overflow-hidden">
         <div className="max-w-7xl mx-auto space-y-4 relative z-10">

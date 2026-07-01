@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
+import { Helmet } from "react-helmet-async";
 import { CheckCircle, Award, Target, Eye, Quote, Heart, ChevronDown } from "lucide-react";
 import { db } from "../firebase/config";
 import { doc, getDoc, collection, getDocs, query, where, orderBy } from "firebase/firestore";
@@ -59,6 +60,15 @@ export function About() {
 
   return (
     <div className="pt-24 min-h-screen">
+      <Helmet>
+        <title>About Us | Amulya Hospital | Narasaraopet</title>
+        <meta
+          name="description"
+          content="Learn about Amulya Hospital (Amulya Nursing Home), providing premium orthopaedic, spine, joint replacements, and trauma care in Narasaraopet since 1992."
+        />
+        <meta name="keywords" content="about amulya hospital, amulya nursing home history, orthopaedic hospital narasaraopet, dr chadavalada aravinda babu" />
+        <link rel="canonical" href={window.location.href} />
+      </Helmet>
       {/* 1. Header Banner */}
       <section className="premium-banner text-white py-16 px-6 md:px-12">
         <div className="max-w-7xl mx-auto space-y-3">
