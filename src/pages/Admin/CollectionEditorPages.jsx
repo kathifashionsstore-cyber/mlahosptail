@@ -183,17 +183,17 @@ export function AdminGallery() {
       description="Manage one dynamic frontend gallery with categories, featured state, drag ordering, bulk upload, previews, and instant publishing."
       fields={[
         { name: "imageUrl", label: "Image URL / Upload", type: "image", wide: true },
-        { name: "caption", label: "Caption", type: "text", required: true },
+        { name: "caption", label: "Caption", type: "text" },
         { name: "altText", label: "Alt Text", type: "text" },
         { name: "category", label: "Category", type: "text", default: "Hospital" },
         { name: "credit", label: "Credit / Event", type: "text" },
         { name: "isFeatured", label: "Featured Image", type: "checkbox", default: false },
         ...activeOrderFields,
       ]}
-      idField="caption"
+      idField="id"
       previewPath={(item) => item.imageUrl}
       bulkImageField="imageUrl"
-      bulkDefaults={{ category: "Hospital", status: "published" }}
+      bulkDefaults={{ category: "Hospital", status: "published", caption: "" }}
     />
   );
 }

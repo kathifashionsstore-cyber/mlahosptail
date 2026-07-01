@@ -7,6 +7,8 @@
   - [ ] Implement `src/pages/PatientStories.jsx` with recovery journey comparisons
 - [ ] Create Specialty and Department routing
   - [ ] Implement `src/pages/DepartmentDetail.jsx` dynamically rendering unique layout formats (Orthopaedics, Spine, Joints, Sports, Trauma, Physiotherapy, Pain, Pediatrics)
+  - [x] Task 12 — MODIFY: Blog.jsx (Index-Resilient Blog Queries for List/Detail Views)
+  - [x] Task 13 — MODIFY: Gallery.jsx, CollectionEditorPages.jsx, AdminCollectionEditor.jsx (Index-Resilient Gallery & Text-Free Bulk Upload)
   - [ ] Implement department index landing page listing specialties
 - [ ] Create Patient Care and Careers portals
   - [ ] Implement `src/pages/PatientCare.jsx` supporting tabs (International patients, Cashback insurance, Packages, FAQs)

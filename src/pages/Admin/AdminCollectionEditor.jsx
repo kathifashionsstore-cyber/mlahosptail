@@ -255,7 +255,7 @@ export function AdminCollectionEditor({
           ...bulkDefaults,
           [bulkImageField]: result.url,
           [`${bulkImageField}DeleteUrl`]: result.deleteUrl || "",
-          caption: bulkDefaults.caption || fileBaseName,
+          caption: bulkDefaults.caption !== undefined ? bulkDefaults.caption : fileBaseName,
           order: items.length + index + 1,
           isActive: true,
         });

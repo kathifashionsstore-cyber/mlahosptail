@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { collection, onSnapshot, orderBy, query, where } from "firebase/firestore";
+import { collection, getDocs } from "firebase/firestore";
 import { AnimatePresence, motion } from "framer-motion";
 import { Helmet } from "react-helmet-async";
 import {
@@ -39,10 +39,8 @@ export function Gallery() {
   useEffect(() => {
     const loadGalleryData = async () => {
       try {
-        // Query standard gallery images
-        const gallerySnap = await getDocs(
-          query(collection(db, "galleryImages"), where("isActive", "==", true), orderBy("order", "asc"))
-        );
+        // Query standard gallery images raw (index-resilient)
+        const gallerySnap = await getDocs(collection(db, "galleryImages"));
         const listGallery = gallerySnap.docs.map((docSnap) => ({ id: docSnap.id, ...docSnap.data() }));
 
         // Query slots from siteImages starting with 'gallery-'
@@ -284,12 +282,14 @@ export function Gallery() {
                       </span>
                     )}
                   </div>
-                  <div className="absolute inset-x-0 bottom-0 translate-y-2 p-5 opacity-0 transition duration-300 group-hover:translate-y-0 group-hover:opacity-100">
-                    <div className="rounded-2xl border border-white/15 bg-white/15 p-4 backdrop-blur-xl">
-                      <h3 className="text-sm font-extrabold text-white">{item.caption || "Amulya Hospital"}</h3>
-                      {item.credit && <p className="mt-1 text-[11px] font-bold text-white/70">{item.credit}</p>}
+                  {item.caption && item.caption !== "Amulya Hospital" && (
+                    <div className="absolute inset-x-0 bottom-0 translate-y-2 p-5 opacity-0 transition duration-300 group-hover:translate-y-0 group-hover:opacity-100">
+                      <div className="rounded-2xl border border-white/15 bg-white/15 p-4 backdrop-blur-xl">
+                        <h3 className="text-sm font-extrabold text-white">{item.caption}</h3>
+                        {item.credit && <p className="mt-1 text-[11px] font-bold text-white/70">{item.credit}</p>}
+                      </div>
                     </div>
-                  </div>
+                  )}
                 </motion.button>
               ))}
             </motion.div>
