@@ -241,6 +241,7 @@ export function expandCondition(condition, index, allConditionsList = []) {
         .map((c) => ({ name: c.name, slug: c.slug }));
 
   return {
+    ...condition,
     id: condition.id || slug,
     slug,
     name: condition.name,
