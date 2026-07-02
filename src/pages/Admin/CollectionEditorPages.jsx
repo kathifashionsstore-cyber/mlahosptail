@@ -111,6 +111,13 @@ const servicesFields = [
   { name: "whenToSeeDoctor", label: "When To See Doctor", type: "lines", wide: true },
   { name: "relatedDoctorIds", label: "Related Doctor IDs", type: "csv", wide: true },
   { name: "relatedServiceSlugs", label: "Related Service Slugs", type: "csv", wide: true },
+  {
+    name: "videoUrl",
+    label: "🎬 YouTube Video URL",
+    type: "youtube",
+    wide: true,
+    help: "Paste any YouTube link — standard, short, or embed URL. Leave empty to hide the video section on this service page."
+  },
   { name: "galleryImages", label: "Gallery Image URLs", type: "lines", wide: true },
   { name: "seoTitle", label: "SEO Title", type: "text", wide: true },
   { name: "seoDescription", label: "SEO Description", type: "textarea", wide: true },

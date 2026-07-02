@@ -33,6 +33,7 @@ import {
 import { db } from "../../firebase/config";
 import { useApp } from "../../context/AppContext";
 import { uploadImageToImgbb } from "../../utils/imgbbUpload";
+import { extractYouTubeId, getThumbnailUrl } from "../../utils/youtube";
 
 function slugify(value) {
   return String(value || "")
@@ -143,6 +144,18 @@ export function AdminCollectionEditor({
   const totalPages = Math.max(1, Math.ceil(sortedItems.length / 20));
   const paginatedItems = sortedItems.slice((currentPage - 1) * 20, currentPage * 20);
   const allVisibleSelected = paginatedItems.length > 0 && paginatedItems.every((item) => selectedIds.includes(item.id));
+
+  const hasYouTubeError = useMemo(() => {
+    return orderedFields.some((field) => {
+      if (field.type === "youtube") {
+        const val = formData[field.name];
+        if (val && val.trim() !== "") {
+          return !extractYouTubeId(val);
+        }
+      }
+      return false;
+    });
+  }, [formData, orderedFields]);
 
   useEffect(() => {
     setCurrentPage(1);
@@ -659,7 +672,20 @@ export function AdminCollectionEditor({
                           )}
                         </div>
                         <div>
-                          <p className="font-bold truncate max-w-xs">{getDisplayTitle(item)}</p>
+                          <div className="flex items-center gap-2">
+                            <p className="font-bold truncate max-w-xs">{getDisplayTitle(item)}</p>
+                            {collectionName === "services" && (
+                              item.videoUrl ? (
+                                <span className="text-[9px] font-extrabold uppercase bg-emerald-100 text-emerald-800 px-1.5 py-0.5 rounded dark:bg-emerald-950/30 dark:text-emerald-450">
+                                  🎬 Video
+                                </span>
+                              ) : (
+                                <span className="text-[9px] font-extrabold uppercase bg-slate-100 text-slate-500 px-1.5 py-0.5 rounded dark:bg-slate-800 dark:text-slate-400">
+                                  No Video
+                                </span>
+                              )
+                            )}
+                          </div>
                           <p className="text-[10px] text-slate-400 font-bold">{item.slug || item.page || item.id}</p>
                         </div>
                       </div>
@@ -841,6 +867,40 @@ export function AdminCollectionEditor({
                             </div>
                           )}
                         </div>
+                      ) : field.type === "youtube" ? (
+                        <div className="space-y-2">
+                          <input
+                            type="text"
+                            placeholder="https://www.youtube.com/watch?v=... or https://youtu.be/..."
+                            value={formData[field.name] ?? ""}
+                            onChange={(event) => handleChange(field.name, event.target.value)}
+                            className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-2 text-sm font-semibold outline-none focus:border-primary text-slate-800 dark:text-slate-100"
+                          />
+                          {(() => {
+                            const val = formData[field.name];
+                            if (val && val.trim() !== "") {
+                              const videoId = extractYouTubeId(val);
+                              if (videoId) {
+                                return (
+                                  <div className="mt-2">
+                                    <img
+                                      src={`https://img.youtube.com/vi/${videoId}/hqdefault.jpg`}
+                                      alt="Video thumbnail preview"
+                                      style={{ width: "200px", borderRadius: "8px" }}
+                                    />
+                                  </div>
+                                );
+                              } else {
+                                return (
+                                  <p className="text-xs font-bold text-red-650 mt-1">
+                                    ⚠️ Please paste a valid YouTube URL
+                                  </p>
+                                );
+                              }
+                            }
+                            return null;
+                          })()}
+                        </div>
                       ) : (
                         <input
                           type={field.type === "number" ? "number" : field.type === "date" ? "date" : field.type === "datetime-local" ? "datetime-local" : "text"}
@@ -865,7 +925,7 @@ export function AdminCollectionEditor({
                   </button>
                   <button
                     type="submit"
-                    disabled={saving || !!uploadingField}
+                    disabled={saving || !!uploadingField || hasYouTubeError}
                     className="inline-flex flex-1 items-center justify-center space-x-2 bg-primary hover:bg-primary-dark dark:bg-primary-light dark:hover:bg-primary text-white font-bold py-3 px-4 rounded-xl shadow-md transition disabled:opacity-50 text-sm"
                   >
                     <Save className="w-4.5 h-4.5" />
