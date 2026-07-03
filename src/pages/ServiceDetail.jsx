@@ -20,7 +20,7 @@ import { Swiper, SwiperSlide } from "swiper/react";
 import { Autoplay, Pagination, Navigation } from "swiper/modules";
 import { db } from "../firebase/config";
 import { useApp } from "../context/AppContext";
-import { useDoctorPhoto } from "../hooks/useDoctorPhoto";
+import { useDoctorPhoto, getDoctorPhoto } from "../hooks/useDoctorPhoto";
 import { expandCondition } from "../utils/conditionExpander";
 import { extractYouTubeId, getEmbedUrl, getThumbnailUrl } from "../utils/youtube";
 
@@ -147,6 +147,29 @@ export function ServiceDetail() {
   }, [service, doctors]);
 
   const specialistPhoto = useDoctorPhoto(specialistDoctor);
+
+  // Filter exactly the founder and senior spine consultant in that order
+  const orderedDoctors = useMemo(() => {
+    if (!doctors || doctors.length === 0) return [];
+    const SPECIALIST_DOCTOR_SLUGS = [
+      'dr-aravinda-babu',
+      'dr-aditya'
+    ];
+    const serviceDoctors = doctors.filter((d) =>
+      SPECIALIST_DOCTOR_SLUGS.includes(d.slug || d.id)
+    );
+    return SPECIALIST_DOCTOR_SLUGS
+      .map((slug) => {
+        const d = serviceDoctors.find((doc) => (doc.slug || doc.id) === slug);
+        if (!d) return null;
+        return {
+          ...d,
+          opdTiming: d.opdTiming || d.consultationTimings || "10:00 AM – 7:00 PM",
+          availableDays: d.availableDays || (Array.isArray(d.consultationDays) ? d.consultationDays.join(", ") : (d.consultationDays || "Mon – Sat"))
+        };
+      })
+      .filter(Boolean);
+  }, [doctors]);
 
   // Related conditions lookup
   const relatedServices = useMemo(() => {
@@ -1190,82 +1213,82 @@ export function ServiceDetail() {
         {/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
             SECTION 14 — MEET THE SPECIALIST
             ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */}
-        {specialistDoctor && (
+        {orderedDoctors.length > 0 && (
           <section className="py-16 md:py-20 bg-white dark:bg-slate-950 border-t border-slate-100 dark:border-slate-900">
             <div className="max-w-[1100px] mx-auto px-6 md:px-8 text-center space-y-12">
               <div>
-                <span className="inline-flex items-center gap-1.5 bg-[#0284C7]/10 text-[#0284C7] text-[11px] tracking-[2px] font-black uppercase px-4 py-1.5 rounded-full mb-4">
-                  👨‍⚕️ OUR SPECIALIST
+                <span className="inline-flex items-center gap-1.5 bg-[#0284C7]/10 text-[#0284C7] text-[11px] tracking-[2px] font-bold uppercase px-4 py-1.5 rounded-full mb-4">
+                  👨‍⚕️ OUR SPECIALISTS
                 </span>
-                <h2 className="text-2xl md:text-3xl font-extrabold text-slate-850 dark:text-white">Meet Your Doctor</h2>
+                <h2 className="text-2xl md:text-3xl font-extrabold text-slate-850 dark:text-white">Meet Our Doctors</h2>
               </div>
 
-              {/* Doctor Card */}
-              <div className="max-w-[800px] mx-auto bg-gradient-to-br from-[#F0F9FF] to-[#E0F2FE] dark:from-sky-950/15 dark:to-sky-950/5 border border-[#BAE6FD] dark:border-sky-900/30 rounded-3xl p-8 md:p-10 shadow-lg text-left flex flex-col md:flex-row items-center gap-8 md:gap-10">
-                {/* Photo */}
-                <div className="flex-shrink-0 w-40 h-40 rounded-full border-4 border-white dark:border-slate-900 overflow-hidden shadow-md">
-                  <img
-                    src={specialistPhoto}
-                    alt={`Dr. ${specialistDoctor.name}`}
-                    className="w-full h-full object-cover"
-                  />
-                </div>
-                {/* Info */}
-                <div className="flex-grow w-full space-y-4">
-                  <div>
-                    <span className="text-[11px] tracking-[2.5px] font-black text-[#0284C7] uppercase">
-                      {specialistDoctor.designation || "Specialist Surgeon"}
-                    </span>
-                    <h3 className="text-2xl font-black text-[#0C4A6E] dark:text-sky-300 mt-1">
-                      Dr. {specialistDoctor.name}
-                    </h3>
-                    <p className="text-xs font-bold text-[#0369A1] dark:text-sky-400 mt-0.5">
-                      {specialistDoctor.qualification}
-                    </p>
-                  </div>
+              {/* Cards Grid */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-5 max-w-[860px] mx-auto">
+                {orderedDoctors.map((doctor) => {
+                  const doctorPhoto = getDoctorPhoto(doctor, null, siteImages);
+                  return (
+                    <div 
+                      key={doctor.id}
+                      className="bg-gradient-to-br from-[#F0F9FF] to-[#E0F2FE] dark:from-sky-950/20 dark:to-sky-950/5 border border-[#BAE6FD] dark:border-sky-900/30 rounded-[20px] p-7 text-center shadow-lg shadow-[#0ea5e9]/10 flex flex-col items-center"
+                    >
+                      {/* Doctor Photo */}
+                      <img
+                        src={doctorPhoto}
+                        alt={doctor.name}
+                        className="w-[110px] h-[110px] rounded-full border-4 border-white dark:border-slate-900 shadow-md object-cover mb-3.5"
+                      />
 
-                  {/* Specialties Pills */}
-                  <div className="flex flex-wrap gap-1.5">
-                    {(Array.isArray(specialistDoctor.specialization) ? specialistDoctor.specialization : []).map((spec, idx) => (
-                      <span 
-                        key={idx}
-                        className="bg-[#E0F2FE] text-[#0369A1] dark:bg-sky-900/35 dark:text-sky-300 px-3 py-1 rounded-full text-[11px] font-extrabold"
-                      >
-                        {spec}
+                      {/* Role Label */}
+                      <span className="text-[11px] tracking-[2px] font-bold text-[#0284C7] uppercase mb-1.5">
+                        {doctor.designation}
                       </span>
-                    ))}
-                  </div>
 
-                  <hr className="border-[#BAE6FD] dark:border-sky-900/30" />
+                      {/* Name */}
+                      <h3 className="text-[19px] font-extrabold text-[#0C4A6E] dark:text-sky-300 mb-1.5">
+                        {doctor.name}
+                      </h3>
 
-                  {/* Info pills */}
-                  <div className="flex flex-wrap gap-3">
-                    <div className="bg-white dark:bg-slate-900 border border-[#BAE6FD] dark:border-sky-900/35 rounded-xl px-4 py-2 flex items-center gap-2 text-xs font-bold text-[#0C4A6E] dark:text-sky-300">
-                      <span>⏰</span>
-                      <span>10:00 AM – 7:00 PM</span>
+                      {/* Qualification */}
+                      <p className="text-sm text-[#0369A1] dark:text-sky-450 mb-3.5">
+                        {doctor.qualification}
+                      </p>
+
+                      {/* Specialty Pills (wrap) */}
+                      <div className="flex flex-wrap justify-center gap-1 mb-4">
+                        {(Array.isArray(doctor.specialization) ? doctor.specialization : []).map((spec, idx) => (
+                          <span 
+                            key={idx}
+                            className="bg-[#E0F2FE] text-[#0369A1] dark:bg-sky-900/35 dark:text-sky-300 px-3 py-1 rounded-full text-xs font-semibold m-[3px]"
+                          >
+                            {spec}
+                          </span>
+                        ))}
+                      </div>
+
+                      {/* OPD timing row */}
+                      <div className="text-[13px] text-[#0C4A6E] dark:text-sky-300 font-semibold mt-3">
+                        ⏰ {doctor.opdTiming} &nbsp;&nbsp; 📅 {doctor.availableDays}
+                      </div>
+
+                      {/* Two Buttons */}
+                      <div className="flex gap-2.5 mt-4 w-full">
+                        <Link
+                          to={`/doctors/${doctor.slug || doctor.id}`}
+                          className="border-[1.5px] border-[#0284C7] hover:bg-[#0284C7]/10 text-[#0284C7] rounded-lg py-[9px] px-[16px] text-[13px] font-semibold text-center transition flex-1"
+                        >
+                          👤 View Profile
+                        </Link>
+                        <Link
+                          to={`/book-appointment?doctorId=${doctor.id}`}
+                          className="bg-[#0284C7] hover:bg-[#0369A1] text-white rounded-lg py-[9px] px-[16px] text-[13px] font-semibold text-center transition flex-1 shadow-md shadow-[#0284C7]/15"
+                        >
+                          📅 Book Appointment
+                        </Link>
+                      </div>
                     </div>
-                    <div className="bg-white dark:bg-slate-900 border border-[#BAE6FD] dark:border-sky-900/35 rounded-xl px-4 py-2 flex items-center gap-2 text-xs font-bold text-[#0C4A6E] dark:text-sky-300">
-                      <span>📅</span>
-                      <span>Mon – Sat</span>
-                    </div>
-                  </div>
-
-                  {/* Button row */}
-                  <div className="flex flex-col sm:flex-row gap-3 pt-3">
-                    <Link
-                      to={`/doctors/${specialistDoctor.id}`}
-                      className="border border-[#0284C7] hover:bg-[#0284C7]/10 text-[#0284C7] py-3 px-5 rounded-xl text-xs font-bold uppercase tracking-wider text-center transition flex-1"
-                    >
-                      👤 View Full Profile
-                    </Link>
-                    <Link
-                      to={`/book-appointment?doctorId=${specialistDoctor.id}`}
-                      className="bg-[#0284C7] hover:bg-[#0369A1] text-white py-3 px-5 rounded-xl text-xs font-bold uppercase tracking-wider text-center transition flex-1 shadow-md shadow-[#0284C7]/15"
-                    >
-                      📅 Book with This Doctor
-                    </Link>
-                  </div>
-                </div>
+                  );
+                })}
               </div>
             </div>
           </section>
