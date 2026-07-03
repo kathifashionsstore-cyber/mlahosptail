@@ -12,35 +12,39 @@ import HeroSlider from "../components/home/HeroSlider";
 import { buildSeedPlan } from "../firebase/seedDataHelpers";
 import {
   ResponsiveContainer,
-  AreaChart,
-  Area,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  Legend,
-  RadarChart,
-  PolarGrid,
-  PolarAngleAxis,
-  PolarRadiusAxis,
-  Radar
+  PieChart,
+  Pie,
+  Cell,
+  Sector
 } from "recharts";
 
-const growthData = [
-  { year: "2022", Patients: 4200, Doctors: 4, Departments: 4, SuccessRate: 91 },
-  { year: "2023", Patients: 5800, Doctors: 5, Departments: 5, SuccessRate: 93 },
-  { year: "2024", Patients: 7100, Doctors: 6, Departments: 6, SuccessRate: 95 },
-  { year: "2025", Patients: 8900, Doctors: 7, Departments: 7, SuccessRate: 97 },
-  { year: "2026", Patients: 10000, Doctors: 7, Departments: 8, SuccessRate: 99 }
+const donutData = [
+  { name: "Joint Replacement",  value: 28, color: "#E74C3C", emoji: "🦵", tagline: "Total, Partial & Revision procedures" },
+  { name: "Spine Care",         value: 22, color: "#3498DB", emoji: "🩻", tagline: "Endoscopic decompression & alignment" },
+  { name: "Trauma & Fractures", value: 20, color: "#F39C12", emoji: "🚑", tagline: "Polytrauma fixation & skeletal rescue" },
+  { name: "Sports Injuries",    value: 12, color: "#2ECC71", emoji: "🏃", tagline: "Keyhole arthroscopic ligament repairs" },
+  { name: "Bone Health",        value: 10, color: "#9B59B6", emoji: "🦴", tagline: "DEXA scanning & bone density monitoring" },
+  { name: "Pediatric Ortho",    value: 8,  color: "#1ABC9C", emoji: "👶", tagline: "Clubfoot correction & pediatric alignment" }
 ];
 
-const performanceData = [
-  { subject: "Recovery Rate", value: 96, fullMark: 100 },
-  { subject: "Patient Satisfaction", value: 98, fullMark: 100 },
-  { subject: "Emergency Response", value: 95, fullMark: 100 },
-  { subject: "Appointments Success", value: 92, fullMark: 100 },
-  { subject: "Surgical Outcomes", value: 99, fullMark: 100 }
-];
+const renderActiveShape = (props) => {
+  const { cx, cy, innerRadius, outerRadius, startAngle, endAngle, fill } = props;
+  const glowColor = fill + "99"; // ~60% opacity
+  return (
+    <g>
+      <Sector
+        cx={cx}
+        cy={cy}
+        innerRadius={innerRadius}
+        outerRadius={outerRadius + 8}
+        startAngle={startAngle}
+        endAngle={endAngle}
+        fill={fill}
+        style={{ filter: `drop-shadow(0 0 8px ${glowColor})` }}
+      />
+    </g>
+  );
+};
 
 const fallbackHomePlan = buildSeedPlan();
 const getFallbackHomeCollection = (collectionName) =>
@@ -87,6 +91,41 @@ export function Home() {
   const { doctors, insurance, settings, services, siteImages, getImageUrl } = useApp();
   const [statistics, setStatistics] = useState([]);
   const [testimonials, setTestimonials] = useState([]);
+  const [isMobile, setIsMobile] = useState(false);
+  const [hoverIndex, setHoverIndex] = useState(-1);
+  const [inView, setInView] = useState(false);
+  const sectionRef = useRef(null);
+
+  const activeIndex = inView ? hoverIndex : -1;
+
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+    handleResize();
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setInView(true);
+          observer.disconnect();
+        }
+      },
+      { threshold: 0.1 }
+    );
+    if (sectionRef.current) {
+      observer.observe(sectionRef.current);
+    }
+    return () => observer.disconnect();
+  }, []);
+
+  const displayData = inView 
+    ? donutData 
+    : [{ name: "Placeholder", value: 100, color: "rgba(255,255,255,0.08)" }];
 
   useEffect(() => {
     const statsQuery = query(collection(db, "statistics"), where("isActive", "==", true), orderBy("order", "asc"));
@@ -295,81 +334,195 @@ export function Home() {
         </div>
       </section>
 
-      {/* 3b. Hospital Growth & Performance Benchmarks */}
-      <section className="py-20 px-6 md:px-12 bg-slate-50/50 dark:bg-slate-900/10 border-b border-slate-100 dark:border-slate-900 transition-colors duration-300">
-        <div className="max-w-7xl mx-auto space-y-12">
-          <div className="text-center max-w-xl mx-auto space-y-3">
-            <span className="text-[13px] tracking-[1.5px] font-bold text-[#D81F26] uppercase block">Performance Metrics</span>
-            <h2 className="text-3xl md:text-4xl font-bold font-serif text-[#0B3C5D] dark:text-white">Growth & Quality Benchmarks</h2>
-            <p className="text-sm text-[#5C6E7A] dark:text-slate-400 leading-relaxed font-semibold">
-              Transparent reporting of our operational growth and clinical success rates over recent years.
+      {/* 3b. Specialties Donut Chart Section */}
+      <section 
+        ref={sectionRef}
+        className="relative py-20 overflow-hidden" 
+        style={{ background: "linear-gradient(135deg, #0D2137 0%, #1B4F72 100%)" }}
+      >
+        {/* Decorative background circle outlines */}
+        <div className="absolute rounded-full border border-white/5 pointer-events-none" style={{ width: "600px", height: "600px", top: "-100px", left: "-200px", opacity: 0.04 }} />
+        <div className="absolute rounded-full border border-white/5 pointer-events-none" style={{ width: "400px", height: "400px", bottom: "-50px", right: "-100px", opacity: 0.04 }} />
+        <div className="absolute rounded-full border border-white/5 pointer-events-none" style={{ width: "800px", height: "800px", top: "20%", left: "50%", transform: "translateX(-50%)", opacity: 0.04 }} />
+        
+        <style>{`
+          @keyframes spin-slow {
+            from { transform: translate(-50%, -50%) rotate(0deg); }
+            to   { transform: translate(-50%, -50%) rotate(360deg); }
+          }
+        `}</style>
+
+        <div className="max-w-7xl mx-auto px-6 md:px-12 relative z-10">
+          {/* Section Header */}
+          <div className="text-center max-w-xl mx-auto space-y-3 mb-14">
+            <span 
+              className="inline-block uppercase tracking-[2.5px] font-bold text-xs px-4.5 py-1.5 rounded-full"
+              style={{ background: "rgba(192,57,43,0.2)", border: "1px solid rgba(192,57,43,0.4)", color: "#FF8A80" }}
+            >
+              🏥 OUR EXPERTISE
+            </span>
+            <h2 className="text-3xl md:text-4xl font-extrabold text-white leading-tight font-serif">
+              Services We Specialize In
+            </h2>
+            <p className="text-sm text-white/70 leading-relaxed font-semibold">
+              Comprehensive orthopaedic, spine & trauma care under one roof in Narasaraopet
             </p>
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-            {/* Graph 1: Hospital Growth Statistics (Area Chart) */}
-            <motion.div
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.6 }}
-              className="bg-white/60 dark:bg-slate-900/40 backdrop-blur-md border border-slate-200/50 dark:border-slate-800/50 p-6 md:p-8 rounded-[26px] shadow-md flex flex-col justify-between space-y-4"
-            >
-              <div className="space-y-1 text-left">
-                <h3 className="text-lg font-bold text-[#0B3C5D] dark:text-white font-serif">Hospital Growth Statistics</h3>
-                <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Multi-Year Scale of Facilities & Success Rate</p>
-              </div>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center max-w-5xl mx-auto">
+            {/* Left Column: Donut Chart */}
+            <div className="relative flex items-center justify-center w-[380px] h-[380px] md:w-[380px] md:h-[380px] sm:w-[280px] sm:h-[280px] mx-auto select-none">
+              {/* Spinning Outer Ring */}
+              <div 
+                className="absolute border-2 border-dashed border-white/10 rounded-full pointer-events-none" 
+                style={{
+                  width: isMobile ? "250px" : "360px",
+                  height: isMobile ? "250px" : "360px",
+                  top: "50%",
+                  left: "50%",
+                  transform: "translate(-50%, -50%)",
+                  animation: "spin-slow 30s linear infinite"
+                }}
+              />
 
-              <div className="h-72 w-full">
+              {/* Recharts PieChart */}
+              <div className="w-[380px] h-[380px] md:w-[380px] md:h-[380px] sm:w-[280px] sm:h-[280px] flex items-center justify-center relative">
                 <ResponsiveContainer width="100%" height="100%">
-                  <AreaChart data={growthData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
-                    <defs>
-                      <linearGradient id="colorPatients" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="5%" stopColor="#1E7FC2" stopOpacity={0.2}/>
-                        <stop offset="95%" stopColor="#1E7FC2" stopOpacity={0}/>
-                      </linearGradient>
-                      <linearGradient id="colorSuccess" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="5%" stopColor="#3FA535" stopOpacity={0.2}/>
-                        <stop offset="95%" stopColor="#3FA535" stopOpacity={0}/>
-                      </linearGradient>
-                    </defs>
-                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(148, 163, 184, 0.1)" />
-                    <XAxis dataKey="year" stroke="#94A3B8" fontSize={11} tickLine={false} />
-                    <YAxis stroke="#94A3B8" fontSize={11} tickLine={false} />
-                    <Tooltip contentStyle={{ backgroundColor: "#0F293A", borderRadius: "16px", border: "none", color: "#fff" }} />
-                    <Legend wrapperStyle={{ fontSize: 11, fontWeight: "bold" }} />
-                    <Area type="monotone" dataKey="Patients" stroke="#1E7FC2" strokeWidth={2.5} fillOpacity={1} fill="url(#colorPatients)" name="Total Patients" />
-                    <Area type="monotone" dataKey="SuccessRate" stroke="#3FA535" strokeWidth={2.5} fillOpacity={1} fill="url(#colorSuccess)" name="Success Rate (%)" />
-                  </AreaChart>
+                  <PieChart>
+                    <Pie
+                      activeIndex={activeIndex}
+                      activeShape={renderActiveShape}
+                      data={displayData}
+                      cx="50%"
+                      cy="50%"
+                      innerRadius={isMobile ? 70 : 100}
+                      outerRadius={isMobile ? 110 : 160}
+                      paddingAngle={inView ? 3 : 0}
+                      startAngle={90}
+                      endAngle={-270}
+                      dataKey="value"
+                      isAnimationActive={inView}
+                      animationBegin={200}
+                      animationDuration={1200}
+                      animationEasing="ease-out"
+                      onMouseEnter={(data, index) => setHoverIndex(index)}
+                      onMouseLeave={() => setHoverIndex(-1)}
+                    >
+                      {displayData.map((entry, index) => (
+                        <Cell key={`cell-${index}`} fill={entry.color} stroke="none" />
+                      ))}
+                    </Pie>
+                  </PieChart>
                 </ResponsiveContainer>
-              </div>
-            </motion.div>
 
-            {/* Graph 2: Hospital Performance (Radar Chart) */}
-            <motion.div
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.6, delay: 0.1 }}
-              className="bg-white/60 dark:bg-slate-900/40 backdrop-blur-md border border-slate-200/50 dark:border-slate-800/50 p-6 md:p-8 rounded-[26px] shadow-md flex flex-col justify-between space-y-4"
-            >
-              <div className="space-y-1 text-left">
-                <h3 className="text-lg font-bold text-[#0B3C5D] dark:text-white font-serif">Clinical Performance Metrics</h3>
-                <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Quality benchmarks & Response Rates</p>
+                {/* Center Label (Absolute Centered) */}
+                <div 
+                  className="absolute text-center flex flex-col items-center justify-center pointer-events-none select-none"
+                  style={{
+                    top: "50%",
+                    left: "50%",
+                    transform: "translate(-50%, -50%)",
+                    width: isMobile ? "130px" : "180px",
+                    height: isMobile ? "130px" : "180px",
+                  }}
+                >
+                  {activeIndex === -1 ? (
+                    // Default label
+                    <div className="space-y-1 transition-opacity duration-150 ease-out opacity-100">
+                      <span className="text-3xl block">🏥</span>
+                      <p className="text-[36px] font-black text-white leading-none">6</p>
+                      <p className="text-[10px] text-white/50 tracking-wider uppercase font-extrabold">Specialties</p>
+                    </div>
+                  ) : (
+                    // Hover label
+                    <div className="space-y-1 transition-opacity duration-150 ease-out opacity-100">
+                      <span className="text-3xl block">
+                        {donutData[activeIndex]?.emoji}
+                      </span>
+                      <p 
+                        className="text-[36px] font-black leading-none" 
+                        style={{ color: donutData[activeIndex]?.color }}
+                      >
+                        {donutData[activeIndex]?.value}%
+                      </p>
+                      <p className="text-[11px] text-white/70 max-w-[120px] mx-auto text-center leading-tight font-bold">
+                        {donutData[activeIndex]?.name}
+                      </p>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+
+            {/* Right Column: Services Legend List */}
+            <div className="text-left w-full space-y-6">
+              <div className="space-y-2.5">
+                {donutData.map((item, idx) => {
+                  const isActive = activeIndex === idx;
+                  return (
+                    <div
+                      key={idx}
+                      onMouseEnter={() => setHoverIndex(idx)}
+                      onMouseLeave={() => setHoverIndex(-1)}
+                      className="flex items-center gap-4 px-5 py-3.5 rounded-2xl cursor-pointer transition-all duration-205"
+                      style={{
+                        background: isActive ? "rgba(255,255,255,0.12)" : "rgba(255,255,255,0.06)",
+                        border: isActive ? "1px solid rgba(255,255,255,0.25)" : "1px solid rgba(255,255,255,0.1)",
+                        transform: isActive && !isMobile ? "translateX(6px)" : "none"
+                      }}
+                    >
+                      {/* Left: Dot + Emoji */}
+                      <div className="flex items-center">
+                        <div 
+                          className="w-3.5 h-3.5 rounded-full flex-shrink-0"
+                          style={{
+                            backgroundColor: item.color,
+                            boxShadow: `0 0 8px ${item.color}`
+                          }}
+                        />
+                        <span className="text-[22px] ml-2 select-none">{item.emoji}</span>
+                      </div>
+
+                      {/* Center */}
+                      <div className="flex-1 min-w-0">
+                        <p className="text-base font-extrabold text-white truncate leading-snug">{item.name}</p>
+                        <p className="text-xs text-white/55 font-semibold mt-0.5 truncate">{item.tagline}</p>
+                      </div>
+
+                      {/* Right */}
+                      <div>
+                        <span 
+                          className="text-xs font-black px-3 py-1 rounded-full border"
+                          style={{
+                            backgroundColor: item.color + "33", // 20% opacity
+                            borderColor: item.color + "66", // 40% opacity
+                            color: item.color
+                          }}
+                        >
+                          {item.value}%
+                        </span>
+                      </div>
+                    </div>
+                  );
+                })}
               </div>
 
-              <div className="h-72 w-full flex items-center justify-center">
-                <ResponsiveContainer width="100%" height="100%">
-                  <RadarChart cx="50%" cy="50%" radius="70%" data={performanceData}>
-                    <PolarGrid stroke="rgba(148, 163, 184, 0.15)" />
-                    <PolarAngleAxis dataKey="subject" stroke="#94A3B8" fontSize={10} tick={{ fontWeight: "bold" }} />
-                    <PolarRadiusAxis angle={30} domain={[0, 100]} stroke="#94A3B8" fontSize={9} />
-                    <Radar name="Performance" dataKey="value" stroke="#D81F26" fill="#D81F26" fillOpacity={0.25} />
-                    <Tooltip contentStyle={{ backgroundColor: "#0F293A", borderRadius: "16px", border: "none", color: "#fff" }} />
-                  </RadarChart>
-                </ResponsiveContainer>
+              {/* Total Stat Row */}
+              <div className="border-t border-white/12 pt-5 mt-4 grid grid-cols-3 gap-4 text-center">
+                <div>
+                  <p className="text-2xl font-black text-[#FFD700]">500+</p>
+                  <p className="text-[9px] text-white/55 tracking-wider uppercase font-black mt-1">Surgeries</p>
+                </div>
+                <div className="border-l border-white/12 pl-2">
+                  <p className="text-2xl font-black text-[#FFD700]">40+</p>
+                  <p className="text-[9px] text-white/55 tracking-wider uppercase font-black mt-1">Conditions Treated</p>
+                </div>
+                <div className="border-l border-white/12 pl-2">
+                  <p className="text-2xl font-black text-[#FFD700]">33+</p>
+                  <p className="text-[9px] text-white/55 tracking-wider uppercase font-black mt-1">Years</p>
+                </div>
               </div>
-            </motion.div>
+            </div>
           </div>
         </div>
       </section>

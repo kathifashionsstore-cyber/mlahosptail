@@ -450,6 +450,112 @@ export function ServiceDetail() {
         </section>
 
         {/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+            SECTION 12 — VIDEO SECTION (Upgrade 1)
+            ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */}
+        {isValidVideo && (
+          <section className="pt-12 pb-16 md:pb-20 text-white bg-gradient-to-br from-[#0D2137] to-[#1a3a5c] border-t border-slate-850">
+            <div className="max-w-[1100px] mx-auto px-6 md:px-8">
+              
+              {/* Header */}
+              <div className="text-center mb-12">
+                <span className="inline-flex items-center gap-1.5 bg-[#C0392B]/12 text-[#FF8A80] text-[11px] tracking-[2.5px] font-bold uppercase px-4 py-1.5 rounded-full mb-4">
+                  🎬 WATCH FIRST
+                </span>
+                <h2 className="text-2xl md:text-3xl font-extrabold">
+                  Watch Our Specialist Explain {service.name}
+                </h2>
+                <p className="text-white/70 text-sm md:text-base font-semibold mt-2">
+                  Before reading further — watch our doctor walk you through this condition and treatment in under 5 minutes
+                </p>
+              </div>
+
+              {/* Video Player Wrapper */}
+              <div className="flex flex-col lg:flex-row gap-8 items-stretch">
+                
+                {/* Left Column: Embed Player (60%) */}
+                <div className="w-full lg:w-[60%] flex items-center justify-center">
+                  <div className="w-full rounded-2xl overflow-hidden shadow-2xl bg-black border border-slate-700 aspect-[16/9] relative">
+                    {!videoLoaded ? (
+                      <div 
+                        className="relative cursor-pointer w-full h-full group"
+                        onClick={() => setVideoLoaded(true)}
+                      >
+                        <img
+                          src={getThumbnailUrl(service.videoUrl)}
+                          className="w-full h-full object-cover group-hover:scale-[1.02] transition duration-500"
+                          alt={`${service.name} video overview`}
+                        />
+                        {/* Play Button Overlay */}
+                        <div className="absolute inset-0 bg-black/35 flex items-center justify-center transition hover:bg-black/45">
+                          <div className="w-14 h-14 md:w-[72px] md:h-[72px] rounded-full bg-red-650 flex items-center justify-center shadow-lg shadow-red-600/50 transition-all duration-300 transform group-hover:scale-110">
+                            <Play className="w-6 h-6 md:w-8 md:h-8 text-white fill-current ml-1" />
+                          </div>
+                        </div>
+                        {/* Play badge */}
+                        <div className="bg-black/70 text-white text-[11px] font-bold px-3.5 py-1.5 rounded absolute bottom-3 right-3">
+                          ▶ Play Video
+                        </div>
+                      </div>
+                    ) : (
+                      <iframe
+                        src={getEmbedUrl(service.videoUrl) + "&autoplay=1"}
+                        title={`${service.name} video tutorial`}
+                        className="w-full h-full border-none"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                        allowFullScreen
+                      />
+                    )}
+                  </div>
+                </div>
+
+                {/* Right Column: Info Panel (40%) */}
+                <div className="w-full lg:w-[40%] bg-white/7 border border-white/12 rounded-2xl p-6 md:p-8 flex flex-col justify-between text-left">
+                  <div>
+                    <h3 className="text-base md:text-lg font-bold flex items-center gap-2 mb-4 border-b border-white/10 pb-3">
+                      📚 What You'll Learn
+                    </h3>
+                    <div className="space-y-3">
+                      {getLearningPoints(service.name, service.slug).map((bullet, idx) => (
+                        <div key={idx} className="flex gap-2.5 items-start">
+                          <span className="text-emerald-450 font-bold">✓</span>
+                          <span className="text-xs text-white/85 font-medium">{bullet}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="mt-8 border-t border-white/10 pt-5">
+                    {specialistDoctor && (
+                      <div className="flex items-center gap-3 mb-5">
+                        <img
+                          src={specialistPhoto}
+                          className="w-10 h-10 rounded-full border border-white/30 object-cover"
+                          alt={`Specialist ${specialistDoctor.name}`}
+                        />
+                        <div>
+                          <p className="text-[10px] uppercase text-white/50 tracking-wider font-extrabold">Explained by our specialist</p>
+                          <p className="text-xs font-bold">Dr. {specialistDoctor.name}</p>
+                          <p className="text-[10px] text-white/70 font-semibold">{specialistDoctor.designation}</p>
+                        </div>
+                      </div>
+                    )}
+
+                    <Link
+                      to="/book-appointment"
+                      className="bg-[#D81F26] hover:bg-[#b3151b] text-white py-3 px-5 rounded-xl font-bold text-xs uppercase tracking-wider block text-center transition w-full shadow-md shadow-red-900/35 hover:-translate-y-0.5"
+                    >
+                      📅 Book a Consultation
+                    </Link>
+                  </div>
+                </div>
+
+              </div>
+
+            </div>
+          </section>
+        )}
+
+        {/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
             SECTION 3 — WHAT IS [CONDITION]? (Overview)
             ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */}
         <section className="py-16 md:py-20 bg-white dark:bg-slate-950">
@@ -1007,111 +1113,7 @@ export function ServiceDetail() {
           </div>
         </section>
 
-        {/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-            SECTION 12 — VIDEO SECTION (Upgrade 1)
-            ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */}
-        {isValidVideo && (
-          <section className="py-16 md:py-20 text-white bg-gradient-to-br from-[#0D2137] to-[#1a3a5c] border-t border-slate-800">
-            <div className="max-w-[1100px] mx-auto px-6 md:px-8">
-              
-              {/* Header */}
-              <div className="text-center mb-12">
-                <span className="inline-flex items-center gap-1.5 bg-[#C0392B]/12 text-[#FF8A80] text-[11px] tracking-[2.5px] font-bold uppercase px-4 py-1.5 rounded-full mb-4">
-                  🎬 WATCH & LEARN
-                </span>
-                <h2 className="text-2xl md:text-3xl font-extrabold">
-                  Understanding {service.name}
-                </h2>
-                <p className="text-white/70 text-sm md:text-base font-semibold mt-2">
-                  Watch our specialist explain this condition and treatment in detail
-                </p>
-              </div>
 
-              {/* Video Player Wrapper */}
-              <div className="flex flex-col lg:flex-row gap-8 items-stretch">
-                
-                {/* Left Column: Embed Player (60%) */}
-                <div className="w-full lg:w-[60%] flex items-center justify-center">
-                  <div className="w-full rounded-2xl overflow-hidden shadow-2xl bg-black border border-slate-700 aspect-[16/9] relative">
-                    {!videoLoaded ? (
-                      <div 
-                        className="relative cursor-pointer w-full h-full group"
-                        onClick={() => setVideoLoaded(true)}
-                      >
-                        <img
-                          src={getThumbnailUrl(service.videoUrl)}
-                          className="w-full h-full object-cover group-hover:scale-[1.02] transition duration-500"
-                          alt={`${service.name} video overview`}
-                        />
-                        {/* Play Button Overlay */}
-                        <div className="absolute inset-0 bg-black/35 flex items-center justify-center transition hover:bg-black/45">
-                          <div className="w-14 h-14 md:w-[72px] md:h-[72px] rounded-full bg-red-650 flex items-center justify-center shadow-lg shadow-red-600/50 transition-all duration-300 transform group-hover:scale-110">
-                            <Play className="w-6 h-6 md:w-8 md:h-8 text-white fill-current ml-1" />
-                          </div>
-                        </div>
-                        {/* Play badge */}
-                        <div className="bg-black/70 text-white text-[11px] font-bold px-3.5 py-1.5 rounded absolute bottom-3 right-3">
-                          ▶ Play Video
-                        </div>
-                      </div>
-                    ) : (
-                      <iframe
-                        src={getEmbedUrl(service.videoUrl) + "&autoplay=1"}
-                        title={`${service.name} video tutorial`}
-                        className="w-full h-full border-none"
-                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                        allowFullScreen
-                      />
-                    )}
-                  </div>
-                </div>
-
-                {/* Right Column: Info Panel (40%) */}
-                <div className="w-full lg:w-[40%] bg-white/7 border border-white/12 rounded-2xl p-6 md:p-8 flex flex-col justify-between text-left">
-                  <div>
-                    <h3 className="text-base md:text-lg font-bold flex items-center gap-2 mb-4 border-b border-white/10 pb-3">
-                      📚 What You'll Learn
-                    </h3>
-                    <div className="space-y-3">
-                      {getLearningPoints(service.name, service.slug).map((bullet, idx) => (
-                        <div key={idx} className="flex gap-2.5 items-start">
-                          <span className="text-emerald-450 font-bold">✓</span>
-                          <span className="text-xs text-white/85 font-medium">{bullet}</span>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-
-                  <div className="mt-8 border-t border-white/10 pt-5">
-                    {specialistDoctor && (
-                      <div className="flex items-center gap-3 mb-5">
-                        <img
-                          src={specialistPhoto}
-                          className="w-10 h-10 rounded-full border border-white/30 object-cover"
-                          alt={`Specialist ${specialistDoctor.name}`}
-                        />
-                        <div>
-                          <p className="text-[10px] uppercase text-white/50 tracking-wider font-extrabold">Explained by our specialist</p>
-                          <p className="text-xs font-bold">Dr. {specialistDoctor.name}</p>
-                          <p className="text-[10px] text-white/70 font-semibold">{specialistDoctor.designation}</p>
-                        </div>
-                      </div>
-                    )}
-
-                    <Link
-                      to="/book-appointment"
-                      className="bg-[#D81F26] hover:bg-[#b3151b] text-white py-3 px-5 rounded-xl font-bold text-xs uppercase tracking-wider block text-center transition w-full shadow-md shadow-red-900/35 hover:-translate-y-0.5"
-                    >
-                      📅 Book a Consultation
-                    </Link>
-                  </div>
-                </div>
-
-              </div>
-
-            </div>
-          </section>
-        )}
 
         {/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
             SECTION 13 — PHOTO GALLERY SLIDER
